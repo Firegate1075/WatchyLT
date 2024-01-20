@@ -1,6 +1,8 @@
 #pragma once
 
-class BMA456 {
+#include <StableBMA.h>
+
+class BMA456 : StableBMA {
 private:
     // private constructor and destructor
     BMA456();
