@@ -7,6 +7,7 @@
 class CredentialRepository {
 private:
     CredentialRepository();
+    ~CredentialRepository() = default;
 
     std::vector<CredentialModel> modelVector;
     void saveModelVector();
