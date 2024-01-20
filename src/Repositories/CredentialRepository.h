@@ -7,7 +7,6 @@
 class CredentialRepository {
 private:
     CredentialRepository();
-    ~CredentialRepository();
 
     std::vector<CredentialModel> modelVector;
     void saveModelVector();
@@ -17,7 +16,7 @@ protected:
 public:
     CredentialRepository(const CredentialRepository&) = delete;
     void operator=(const CredentialRepository&) = delete;
-    CredentialRepository& getInstace();
+    static CredentialRepository& getInstace();
 
     std::vector<CredentialModel>& loadAll();
     bool save(CredentialModel&);

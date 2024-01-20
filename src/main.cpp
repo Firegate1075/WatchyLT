@@ -3,7 +3,7 @@
 #include <Arduino.h>
 void setup()
 {
-    CredentialRepository credentialRepository();
+    CredentialRepository& credentialRepository = CredentialRepository::getInstace();
     // create Controller instance
     Controller& controller = Controller::getInstance();
 }
