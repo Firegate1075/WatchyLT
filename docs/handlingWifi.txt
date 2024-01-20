@@ -1,0 +1,67 @@
+Wifi handling ideas:
+Watchy supports the addition of WiFi AP credentials via WiFiManagers credential manager.
+Users can select any of the eight saved APs in menu and also start the credential manager to add a new one.
+If there are already eight APs saved, the user needs to delete any one of the saved connections to add a new one.
+
+Each connnection entry opens a submenu upon button press where users can select between connecting to or deleting that AP.
+
+
+MENU 
+    -> AP 1
+        -> connect
+        -> delete
+    -> AP 2
+        -> connect
+        -> delete
+    -> AP 3
+        -> connect
+        -> delete
+    -> AP 4
+        -> connect
+        -> delete
+    -> AP 5
+        -> connect
+        -> delete
+    -> AP 6
+        -> connect
+        -> delete
+    -> AP 7
+        -> connect
+        -> delete
+    -> AP 8
+        -> connect
+        -> delete
+
+
+If fewer than 8 APs are registered, the option to add a new one appears:
+
+MENU 
+    -> AP 1
+        -> connect
+        -> delete
+    -> AP 2
+        -> connect
+        -> delete
+    -> AP 3
+        -> connect
+        -> delete
+    -> AP 4
+        -> connect
+        -> delete
+    -> AP 5
+        -> connect
+        -> delete
+    -> AP 6
+        -> connect
+        -> delete
+    -> AP 7
+        -> connect
+        -> delete
+    -> Add AP (starts credential manager)
+
+
+Adding new credentials:
+After saving new credentials in credential manager, esp32 will try to connect to that AP.
+Afterwards the new credentials can be read back with WiFiManager.getWiFiSSID(true) and WiFiManager.getWiFiPass(true)
+
+The current AP shall be encapsulated in a CredentialModel object and saved in Controller, from where WiFiHandler will fetch it whenever neccesarry.
