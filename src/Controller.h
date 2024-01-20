@@ -1,21 +1,21 @@
 #pragma once
 
+/// @brief Controller class for Watchy
 class Controller {
 private:
-    // private constructors
+    // private constructor and destructor
     Controller();
-    Controller(const Controller&);
     ~Controller() { }
-    void operator=(const Controller&);
 
 protected:
 public:
-    // Get singleton instance of Controller object
+    // Get singleton instance of Controller class
     static Controller& getInstance()
     {
         static Controller instance;
         return instance;
     }
+    // remove copy constructor and assignment operator
     Controller(const Controller&) = delete;
     void operator=(const Controller&) = delete;
 };

@@ -2,23 +2,19 @@
 
 class WifiHandler {
 private:
-    // private constructors
+    // private constructor and destructor
     WifiHandler();
-    WifiHandler(const WifiHandler&);
     ~WifiHandler() { }
-    void operator=(const WifiHandler&);
 
 protected:
 public:
-    // Get singleton instance of WifiHandler object
+    // Get singleton instance of WifiHandler class
     static WifiHandler& getInstance()
     {
         static WifiHandler instance;
         return instance;
     }
+    // remove copy constructor and assignment operator
     WifiHandler(const WifiHandler&) = delete;
     void operator=(const WifiHandler&) = delete;
-
-    void updateDisplay();
-    void handleButtons();
 };
