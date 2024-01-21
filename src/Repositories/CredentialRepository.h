@@ -19,6 +19,6 @@ public:
     void operator=(const CredentialRepository&) = delete;
     static CredentialRepository& getInstace();
 
-    std::vector<CredentialModel>& loadAll();
+    const std::vector<CredentialModel>& loadAll();
     bool save(CredentialModel&);
 };

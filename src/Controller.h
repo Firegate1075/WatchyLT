@@ -1,4 +1,6 @@
 #pragma once
+#include <Arduino.h>
+#include <esp32-hal.h>
 
 /// @brief Controller class for Watchy
 class Controller {

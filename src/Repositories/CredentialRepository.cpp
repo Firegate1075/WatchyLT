@@ -6,6 +6,7 @@ RTC_DATA_ATTR char passwordRaw[8][64];
 CredentialRepository::CredentialRepository()
     : modelVector(8)
 {
+    loadModelVector();
 }
 
 void CredentialRepository::saveModelVector()
@@ -28,7 +29,7 @@ void CredentialRepository::loadModelVector()
     }
 }
 
-std::vector<CredentialModel>& CredentialRepository::loadAll()
+const std::vector<CredentialModel>& CredentialRepository::loadAll()
 {
     return modelVector;
 }

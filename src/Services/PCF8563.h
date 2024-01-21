@@ -1,10 +1,14 @@
 #pragma once
 
+#include <Rtc_Pcf8563.h>
+
 class PCF8563 {
 private:
     // private constructor and destructor
     PCF8563();
     ~PCF8563() { }
+
+    Rtc_Pcf8563 rtc;
 
 protected:
 public:
