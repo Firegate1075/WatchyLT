@@ -61,15 +61,15 @@ void WifiHandler::onConfigPortalTimeout()
 }
 
 /**
- * @brief Connect to WiFi with Credentials. A connection failure will start the configuration portal This is always blocking.
+ * @brief Connect to WiFi with Credentials. This is always blocking.
  *
  * @param credentials The Credentials needed for the WiFi network
  * @return true -> Connection successfull
- * @return false -> Connection failed, configuration portal will be started
+ * @return false -> Connection failed
  */
 bool WifiHandler::connectToNetwork(CredentialModel& credentials)
 {
-    bool success = wifiManager.autoConnect(credentials.getSSID().c_str(), credentials.getPassword().c_str());
+    bool success = WiFi.begin(credentials.getSSID().c_str(), credentials.getPassword().c_str()) == WL_CONNECTED;
     return success;
 }
 
