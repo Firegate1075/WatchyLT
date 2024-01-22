@@ -64,8 +64,8 @@ void WifiHandler::onConfigPortalTimeout()
  * @brief Connect to WiFi with Credentials. This is always blocking.
  *
  * @param credentials The Credentials needed for the WiFi network
- * @return true -> Connection successfull
- * @return false -> Connection failed
+ * @retval true -> Connection successfull
+ * @retval false -> Connection failed
  */
 bool WifiHandler::connectToNetwork(CredentialModel& credentials)
 {
@@ -76,8 +76,8 @@ bool WifiHandler::connectToNetwork(CredentialModel& credentials)
 /**
  * @brief Disconnect from current network.
  *
- * @return true -> Disconnected successfully
- * @return false -> Disconnecting failed
+ * @retval true -> Disconnected successfully
+ * @retval false -> Disconnecting failed
  */
 bool WifiHandler::disconnect()
 {
@@ -87,8 +87,8 @@ bool WifiHandler::disconnect()
 /**
  * @brief Start configuration portal. Starting requiers loop() function call
  *
- * @return true -> start successfull, loop() function call is now needed
- * @return false -> start failed if portal is already running
+ * @retval true -> start successfull, loop() function call is now needed
+ * @retval false -> start failed if portal is already running
  */
 bool WifiHandler::openConfigurationPortal()
 {
@@ -98,8 +98,8 @@ bool WifiHandler::openConfigurationPortal()
 /**
  * @brief Stop configuration portal
  *
- * @return true -> stopped successfully
- * @return false -> stopping failed
+ * @retval true -> stopped successfully
+ * @retval false -> stopping failed
  */
 bool WifiHandler::closeConfigurationPortal()
 {
