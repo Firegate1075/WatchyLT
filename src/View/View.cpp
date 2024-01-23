@@ -3,3 +3,7 @@
 View::View()
 {
 }
+
+void View::handleButtons()
+{
+}

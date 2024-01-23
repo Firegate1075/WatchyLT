@@ -1,10 +1,14 @@
 #pragma once
 
+#include "Menus/MainMenu.h"
+
 class View {
 private:
     // private constructors
     View();
     ~View() { }
+
+    MainMenu& mainMenu = MainMenu::getInstance();
 
 protected:
 public:
