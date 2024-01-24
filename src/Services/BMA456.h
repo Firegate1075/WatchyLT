@@ -22,11 +22,6 @@ typedef enum {
     ACTIVITY_ERROR
 } activity;
 
-#define BMA423x_INT1_PIN 14
-#define BMA423x_INT2_PIN 12
-#define BMA423x_INT1_MASK (1 << BMA423x_INT1_PIN)
-#define BMA423x_INT2_MASK (1 << BMA423x_INT2_PIN)
-
 class BMA456 {
 private:
     // private constructor and destructor
@@ -38,6 +33,8 @@ private:
     uint16_t __IRQ_MASK;
     bool __init;
     struct bma4_dev bma;
+    uint8_t PIN_BMA_INT1;
+    uint8_t PIN_BMA_INT2;
 
     int8_t BMA456_read_i2c(uint8_t dev_addr, uint8_t reg_addr, uint8_t* reg_data, uint16_t count);
     int8_t BMA456_write_i2c(uint8_t dev_addr, uint8_t reg_addr, uint8_t* reg_data, uint16_t count);
@@ -59,7 +56,7 @@ public:
     BMA456(const BMA456&) = delete;
     void operator=(const BMA456&) = delete;
 
-    bool init(); // Same as original but requires an RTCType from WatchyRTC or SmallRTC.
+    bool init(uint8_t pinInt1, uint8_t pinInt2); // Same as original but requires an RTCType from WatchyRTC or SmallRTC.
 
     void softReset(); // Same as original.
     void enablePowerSave(); // Same as original.

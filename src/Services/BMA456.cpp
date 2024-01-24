@@ -15,8 +15,11 @@ BMA456::BMA456()
 /// @return success of initialization
 /// @retval true -> initialization successfull
 /// @retval false -> initialization failed
-bool BMA456::init()
+bool BMA456::init(uint8_t pinInt1, uint8_t pinInt2)
 {
+    PIN_BMA_INT1 = pinInt1;
+    PIN_BMA_INT2 = pinInt2;
+
     bma.intf = BMA4_I2C_INTF;
     bma.variant = BMA45X_VARIANT;
 
@@ -326,7 +329,7 @@ bool BMA456::isAnyNoMotion()
 bool BMA456::didBMAWakeUp(uint64_t hwWakeup)
 {
     // This can stay BMA432 since its pin dependend of the ESP32
-    bool B = ((hwWakeup & BMA423x_INT2_MASK) || (hwWakeup & BMA423x_INT2_MASK));
+    bool B = ((hwWakeup & (1 << PIN_BMA_INT2)) || (hwWakeup & (1 << PIN_BMA_INT2)));
     if (!B)
         return B;
     if (getINT())
