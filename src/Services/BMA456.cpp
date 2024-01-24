@@ -42,6 +42,43 @@ bool BMA456::init(uint8_t pinInt1, uint8_t pinInt2)
 
     bma4_delay_us_fptr_t(20);
 
+    struct bma4_int_pin_config config;
+    config.edge_ctrl = BMA4_LEVEL_TRIGGER;
+    config.lvl = BMA4_ACTIVE_HIGH;
+    config.od = BMA4_PUSH_PULL;
+    config.output_en = BMA4_OUTPUT_ENABLE;
+    config.input_en = BMA4_INPUT_DISABLE;
+
+    if (setINTPinConfig(config, BMA4_INTR1_MAP) == false) {
+        DEBUG("BMA456 INT PIN CONFIG FAIL\n");
+        return false;
+    }
+
+    struct bma4_accel_config cfg;
+    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
+    cfg.range = BMA4_ACCEL_RANGE_2G;
+    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
+    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
+
+    if (setAccelerometerConfig(cfg) == false) {
+        DEBUG("BMA456 ACCELEROMETER CONFIG FAIL\n");
+        return false;
+    }
+
+    if (enableAccelerometer() == false) {
+        DEBUG("BMA456 ACCELEROMETER ENABLE FAIL\n");
+        return false;
+    }
+
+    struct bma4_remap remap_data;
+    remap_data.x = BMA4_Y;
+    remap_data.y = BMA4_X;
+    remap_data.z = BMA4_NEG_Z;
+    if (remapAxes(&remap_data) == false) {
+        DEBUG("BMA456 AXES REMAP FAIL\n");
+        return false;
+    }
+
     DEBUG("BMA456 SUCCESS\n");
     return true;
 }
@@ -73,15 +110,6 @@ struct bma4_err_reg BMA456::getErrorCode()
     return error;
 }
 
-/// @brief reads interrupt flags register from BMA456
-/// @return bitmap of interrupt flags
-uint16_t BMA456::getInterruptFlags()
-{
-    uint16_t status;
-    bma4_read_int_status(&status, &bma);
-    return status;
-}
-
 /// @brief retrieves uptime of BMA456
 /// @return uptime of BMA456 (1LSB = 39.25us)
 uint32_t BMA456::getSensorTime()
@@ -103,9 +131,9 @@ bool BMA456::selfTest()
 }
 
 /// @brief computes orientation of Watchy
-/// @return orientation of Watchy
+/// @return orientation_t of Watchy
 /// @retval ORIENTATION_ERROR -> failed to get acceleration
-orientation BMA456::getOrientation()
+orientation_t BMA456::getOrientation()
 {
     struct bma4_accel acc;
     if (!getAcceleration(acc))
@@ -199,6 +227,16 @@ bool BMA456::enableAccelerometer()
     return (BMA4_OK == bma4_set_accel_enable(BMA4_ENABLE, &bma));
 }
 
+bool BMA456::enableStepCounter()
+{
+    return false;
+}
+
+bool BMA456::disableStepCounter()
+{
+    return false;
+}
+
 /// @brief upload accelerometer config to BMA456
 /// @param cfg bma4_accel_config structure containing configuration data for BMA456 accelerometer
 /// @return success
@@ -261,6 +299,54 @@ uint32_t BMA456::getStepCounter()
     return 0;
 }
 
+/**
+ * @brief enable the activity detection feature of BMA456
+ *
+ * @return success
+ * @retval true -> success
+ * @retval false -> fail
+ */
+bool BMA456::enableActivityDetection()
+{
+    return setFeatureEnable(BMA456W_STEP_ACT, true);
+}
+
+/**
+ * @brief disable the activity detection feature of BMA456
+ *
+ * @return success
+ * @retval true -> success
+ * @retval false -> fail
+ */
+bool BMA456::disableActivityDetection()
+{
+    return setFeatureEnable(BMA456W_STEP_ACT, false);
+}
+
+/**
+ * @brief enable the wrist wear wakeup feature of BMA456
+ *
+ * @return success
+ * @retval true -> success
+ * @retval false -> fail
+ */
+bool BMA456::enableWristWearDetection()
+{
+    return setFeatureEnable(BMA456W_WRIST_WEAR_WAKEUP, true);
+}
+
+/**
+ * @brief disable the wrist wear wakeup feature of BMA456
+ *
+ * @return success
+ * @retval true -> success
+ * @retval false -> fail
+ */
+bool BMA456::disableWristWearDetection()
+{
+    return setFeatureEnable(BMA456W_WRIST_WEAR_WAKEUP, false);
+}
+
 /// @brief configure BMA456's interrupt pin
 /// @param config stucture containing configuration data for interrupt pin
 /// @param interruptPin specifies interrupt pin of BMA456. Use bma4 macros.
@@ -272,9 +358,41 @@ bool BMA456::setINTPinConfig(struct bma4_int_pin_config config, uint8_t interrup
     return BMA4_OK == bma4_set_int_pin_config(&config, interruptPin, &bma);
 }
 
-bool BMA456::getINT()
+/**
+ * @brief retrieves the cause for BMA456 interrupt
+ *
+ * @return bma456_interrupt_t stores the reason for the triggered interrupt
+ * @retval BMA456_INT_ERROR -> error while retrieving interrupt
+ * @retval BMA456_INT_ERROR_INT -> interrupt due to BMA456 error
+ * @retval BMA456_INT_NONE -> no interrupt triggered by BMA456
+ */
+bma456_interrupt_t BMA456::getInterrupt()
 {
-    return (BMA4_OK == bma456w_read_int_status(&__IRQ_MASK, &bma));
+    uint16_t interruptMask;
+    if (bma456w_read_int_status(&interruptMask, &bma) != BMA4_OK) {
+        return BMA456_INT_ERROR;
+    }
+
+    if (interruptMask & BMA456W_STEP_CNTR_INT) {
+        return BMA456_INT_STEP_CNTR;
+    }
+    if (interruptMask & BMA456W_ACTIVITY_INT) {
+        return BMA456_INT_ACTIVITY;
+    }
+    if (interruptMask & BMA456W_WRIST_WEAR_WAKEUP_INT) {
+        return BMA456_INT_WRIST_WEAR;
+    }
+    if (interruptMask & BMA456W_ANY_MOT_INT) {
+        return BMA456_INT_ANY_MOT;
+    }
+    if (interruptMask & BMA456W_NO_MOT_INT) {
+        return BMA456_INT_NO_MOT;
+    }
+    if (interruptMask & BMA456W_ERROR_INT) {
+        return BMA456_INT_ERROR_INT;
+    }
+
+    return BMA456_INT_NONE;
 }
 
 bool BMA456::setInterruptEnable(uint8_t interruptPin, uint16_t int_map, bool enable)
@@ -286,88 +404,64 @@ bool BMA456::setInterruptEnable(uint8_t interruptPin, uint16_t int_map, bool ena
     }
 }
 
-bool BMA456::enableFeature(uint8_t feature, uint8_t enable)
+bool BMA456::setFeatureEnable(uint8_t feature, bool enable)
 {
-    if ((feature & BMA456W_STEP_CNTR) == BMA456W_STEP_CNTR) {
-        // bma456w_step_detector_enable(enable ? BMA4_ENABLE : BMA4_DISABLE, &bma);
-        int8_t success = bma4_set_accel_enable(BMA4_ENABLE, &bma) == BMA4_OK;
-        if (success)
-            success = bma456w_feature_enable(BMA456W_STEP_CNTR, BMA4_ENABLE, &bma) == BMA4_OK;
-        if (success)
-            success = bma456w_map_interrupt(BMA4_INTR1_MAP, BMA456W_STEP_CNTR_INT, BMA4_ENABLE, &bma) == BMA4_OK;
-        return success;
+    if (enable == true) {
+        return (BMA4_OK == bma456w_feature_enable(feature, BMA4_ENABLE, &bma));
+    } else {
+        return (BMA4_OK == bma456w_feature_enable(feature, BMA4_DISABLE, &bma));
     }
-    return (BMA4_OK == bma456w_feature_enable(feature, enable, &bma));
 }
 
-bool BMA456::isStepCounter()
+bool BMA456::setStepCountInterruptEnable(bool en)
 {
-    return (bool)(BMA456W_STEP_CNTR_INT & __IRQ_MASK);
-}
+    if (enableStepCounter() == false) {
+        return false;
+    }
 
-bool BMA456::isDoubleClick()
-{
-    return false;
-    // return (bool)(BMA423_WAKEUP_INT & __IRQ_MASK);
-}
-
-bool BMA456::isTilt()
-{
-    return (bool)(BMA456W_WRIST_WEAR_WAKEUP_INT & __IRQ_MASK);
-}
-
-bool BMA456::isActivity()
-{
-    return (bool)(BMA456W_ACTIVITY_INT & __IRQ_MASK);
-}
-
-bool BMA456::isAnyNoMotion()
-{
-    return (bool)(BMA456W_ANY_MOT_INT & __IRQ_MASK);
-}
-
-bool BMA456::didBMAWakeUp(uint64_t hwWakeup)
-{
-    // This can stay BMA432 since its pin dependend of the ESP32
-    bool B = ((hwWakeup & (1 << PIN_BMA_INT2)) || (hwWakeup & (1 << PIN_BMA_INT2)));
-    if (!B)
-        return B;
-    if (getINT())
-        return B;
-    return false;
-}
-
-bool BMA456::setStepCountInterrupt(bool en)
-{
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_STEP_CNTR_INT, en);
 }
 
-bool BMA456::setActivityInterrupt(bool en)
+bool BMA456::setActivityInterruptEnable(bool en)
 {
+    if (enableActivityDetection() == false) {
+        return false;
+    }
+
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_ACTIVITY_INT, en);
 }
 
-bool BMA456::setWristInterrupt(bool en)
+bool BMA456::setWristInterruptEnable(bool en)
 {
+    if (enableWristWearDetection() == false) {
+        return false;
+    }
+
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_WRIST_WEAR_WAKEUP_INT, en);
 }
 
-bool BMA456::setAnyMotionInterrupt(bool en)
+bool BMA456::setAnyMotionInterruptEnable(bool en)
 {
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_ANY_MOT_INT, en);
 }
 
-bool BMA456::setNoMotionInterrupt(bool en)
+bool BMA456::setNoMotionInterruptEnable(bool en)
 {
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_NO_MOT_INT, en);
 }
 
-bool BMA456::setErrorInterrupt(bool en)
+bool BMA456::setErrorInterruptEnable(bool en)
 {
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_ERROR_INT, en);
 }
 
-activity BMA456::getActivity()
+/**
+ * @brief retrieves user activity
+ *
+ * @return activity_t current activity
+ * @retval ACTIVITY_ERROR -> error retrieving activity
+ */
+activity_t BMA456::getActivity()
 {
     uint8_t userActivity = -1;
     bma456w_activity_output(&userActivity, &bma);
@@ -388,52 +482,6 @@ activity BMA456::getActivity()
         return ACTIVITY_ERROR;
         break;
     }
-}
-
-bool BMA456::defaultConfig()
-{
-    struct bma4_int_pin_config config;
-    config.edge_ctrl = BMA4_LEVEL_TRIGGER;
-    config.lvl = BMA4_ACTIVE_HIGH;
-    config.od = BMA4_PUSH_PULL;
-    config.output_en = BMA4_OUTPUT_ENABLE;
-    config.input_en = BMA4_INPUT_DISABLE;
-
-    if (setINTPinConfig(config, BMA4_INTR1_MAP) == false) {
-        return false;
-    }
-
-    struct bma4_accel_config cfg;
-    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
-    cfg.range = BMA4_ACCEL_RANGE_2G;
-    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
-    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
-
-    if (setAccelerometerConfig(cfg) == false) {
-        return false;
-    }
-
-    if (enableAccelerometer() == false) {
-        return false;
-    }
-
-    struct bma4_remap remap_data;
-    remap_data.x = BMA4_Y;
-    remap_data.y = BMA4_X;
-    remap_data.z = BMA4_NEG_Z;
-    return remapAxes(&remap_data);
-}
-
-bool BMA456::enableDoubleClickWake(bool en)
-{
-    // if (enableFeature(BMA423_WAKEUP,en)) return enableWakeupInterrupt(en);
-    return false;
-}
-
-bool BMA456::enableTiltWake(bool en)
-{
-    // if (enableFeature(BMA423_TILT,en)) return enableTiltInterrupt(en);
-    return false;
 }
 
 void BMA456::bma4xx_hal_delay_usec(uint32_t period_us, void* intf_ptr)
@@ -528,13 +576,12 @@ int8_t BMA456::bma4_interface_i2c_init(struct bma4_dev* bma)
     if (bma != NULL) {
 
         /* Bus configuration : I2C */
-        __address = BMA4_I2C_ADDR_PRIMARY;
         bma->intf = BMA4_I2C_INTF;
         bma->bus_read = bma4xx_hal_i2c_bus_read;
         bma->bus_write = bmi4xx_hal_i2c_bus_write;
 
         /* Assign device address to interface pointer */
-        bma->intf_ptr = &__address;
+        bma->intf_ptr = &BMA456_DEVICE_ADDR;
 
         /* Assign Variant */
         bma->variant = BMA45X_VARIANT;

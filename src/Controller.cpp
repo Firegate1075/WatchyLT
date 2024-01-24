@@ -13,7 +13,7 @@ Controller::Controller(pin_config_t pinConfiguration)
     // handle initialBoot (wakeup after flashing)
     if (initialBoot) {
         // initialize sensors
-        BMA456::getInstance().init(12, 14);
+        BMA456::getInstance().init(pinConfig.bmaInt1, pinConfig.bmaInt2);
     }
 
     // configure wake up pins
