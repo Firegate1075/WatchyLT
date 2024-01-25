@@ -1,14 +1,15 @@
 #pragma once
 
-#include "Menus/MainMenu.h"
+#include <memory>
+
+class MenuComponent;
 
 class View {
 private:
     // private constructors
     View();
     ~View() { }
-
-    MainMenu& mainMenu = MainMenu::getInstance();
+    MenuComponent* currentEntry;
 
 protected:
 public:
@@ -24,4 +25,5 @@ public:
 
     void updateDisplay();
     void handleButtons();
+    void setCurrentMenuEntry(MenuComponent* newEntry);
 };
