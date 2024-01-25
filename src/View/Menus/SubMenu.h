@@ -5,13 +5,13 @@
 
 class SubMenu : public MenuComponent {
 private:
-    static const size_t MAX_MENU_SIZE = 8;
-
     etl::vector<MenuComponent*, MAX_MENU_SIZE> children;
+    etl::vector<MenuComponent*, MAX_MENU_SIZE>::iterator childrenIterator; // TODO: iterator needs to be initialized
 
 public:
     MenuComponent* getNextItem();
     MenuComponent* getPreviousItem();
 
+    virtual void handleEnterButton();
     virtual void display();
 };

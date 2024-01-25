@@ -3,8 +3,10 @@
 #include "../Metropolis_Font.h"
 #include "../WatchyDisplay.h"
 #include "View/View.h"
-
+#include "constants.h"
 class SubMenu;
+
+using CONST_MENU::MAX_MENU_SIZE;
 
 class MenuComponent {
 protected:
