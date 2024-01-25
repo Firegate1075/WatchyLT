@@ -1,21 +1,31 @@
 #include "CredentialModel.h"
 
-String CredentialModel::getSSID()
+string<SSID_LEN> CredentialModel::getSSID()
 {
     return ssid;
 }
 
-String CredentialModel::getPassword()
+string<PASS_LEN> CredentialModel::getPassword()
 {
     return password;
 }
 
-void CredentialModel::setSSID(String ssid)
+void CredentialModel::setSSID(string<SSID_LEN> ssid)
 {
     this->ssid = ssid;
 }
 
-void CredentialModel::setPassword(String password)
+void CredentialModel::setPassword(string<PASS_LEN> password)
 {
     this->password = password;
+}
+
+void CredentialModel::setSSID(const char* ssid)
+{
+    this->ssid = string<SSID_LEN>(ssid);
+}
+
+void CredentialModel::setPassword(const char* password)
+{
+    this->password = string<PASS_LEN>(password);
 }

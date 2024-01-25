@@ -27,8 +27,8 @@ CredentialModel WifiHandler::getCredentialsOfCurrentNetwork()
 {
     CredentialModel credentials;
     if (WiFi.isConnected()) {
-        credentials.setSSID(wifiManager.getWiFiSSID(false));
-        credentials.setPassword(wifiManager.getWiFiPass(false));
+        credentials.setSSID(wifiManager.getWiFiSSID(false).c_str());
+        credentials.setPassword(wifiManager.getWiFiPass(false).c_str());
     }
     return credentials;
 }

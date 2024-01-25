@@ -1,15 +1,20 @@
 #pragma once
 
+#include "constants.h"
 #include <Models/CredentialModel.h>
 #include <esp32-hal.h>
-#include <vector>
+#include <etl/vector.h>
+
+using CONST_CREDENTIALS::MAX_CREDENTIALS;
+using CONST_CREDENTIALS::PASS_LEN;
+using CONST_CREDENTIALS::SSID_LEN;
 
 class CredentialRepository {
 private:
     CredentialRepository();
     ~CredentialRepository() = default;
 
-    std::vector<CredentialModel> modelVector;
+    etl::vector<CredentialModel, MAX_CREDENTIALS> modelVector;
     void saveModelVector();
     void loadModelVector();
 
@@ -19,6 +24,6 @@ public:
     void operator=(const CredentialRepository&) = delete;
     static CredentialRepository& getInstace();
 
-    const std::vector<CredentialModel>& loadAll();
+    const etl::vector<CredentialModel, MAX_CREDENTIALS>& loadAll();
     bool save(CredentialModel&);
 };
