@@ -133,21 +133,21 @@ bool BMA456::selfTest()
 /// @brief computes orientation of Watchy
 /// @return orientation_t of Watchy
 /// @retval ORIENTATION_ERROR -> failed to get acceleration
-orientation_t BMA456::getOrientation()
+BMA456_orientation BMA456::getOrientation()
 {
     struct bma4_accel acc;
     if (!getAcceleration(acc))
-        return ORIENTATION_ERROR;
+        return BMA456_orientation::ERROR;
     uint16_t absX = abs(acc.x);
     uint16_t absY = abs(acc.y);
     uint16_t absZ = abs(acc.z);
 
     if ((absZ > absX) && (absZ > absY)) {
-        return ((acc.z < 0) ? ORIENTATION_DISP_DOWN : ORIENTATION_DISP_UP);
+        return ((acc.z < 0) ? BMA456_orientation::DISP_DOWN : BMA456_orientation::DISP_UP);
     } else if ((absY > absX) && (absY > absZ)) {
-        return ((acc.y < 0) ? ORIENTATION_BOTTOM_EDGE_UP : ORIENTATION_TOP_EDGE_UP);
+        return ((acc.y < 0) ? BMA456_orientation::BOTTOM_EDGE_UP : BMA456_orientation::TOP_EDGE_UP);
     } else {
-        return ((acc.x < 0) ? ORIENTATION_LEFT_EDGE_UP : ORIENTATION_RIGHT_EDGE_UP);
+        return ((acc.x < 0) ? BMA456_orientation::LEFT_EDGE_UP : BMA456_orientation::RIGHT_EDGE_UP);
     }
 }
 
@@ -366,33 +366,33 @@ bool BMA456::setINTPinConfig(struct bma4_int_pin_config config, uint8_t interrup
  * @retval BMA456_INT_ERROR_INT -> interrupt due to BMA456 error
  * @retval BMA456_INT_NONE -> no interrupt triggered by BMA456
  */
-bma456_interrupt_t BMA456::getInterrupt()
+BMA456_interrupt BMA456::getInterrupt()
 {
     uint16_t interruptMask;
     if (bma456w_read_int_status(&interruptMask, &bma) != BMA4_OK) {
-        return BMA456_INT_ERROR;
+        return BMA456_interrupt::ERROR;
     }
 
     if (interruptMask & BMA456W_STEP_CNTR_INT) {
-        return BMA456_INT_STEP_CNTR;
+        return BMA456_interrupt::STEP_CNTR;
     }
     if (interruptMask & BMA456W_ACTIVITY_INT) {
-        return BMA456_INT_ACTIVITY;
+        return BMA456_interrupt::ACTIVITY;
     }
     if (interruptMask & BMA456W_WRIST_WEAR_WAKEUP_INT) {
-        return BMA456_INT_WRIST_WEAR;
+        return BMA456_interrupt::WRIST_WEAR;
     }
     if (interruptMask & BMA456W_ANY_MOT_INT) {
-        return BMA456_INT_ANY_MOT;
+        return BMA456_interrupt::ANY_MOT;
     }
     if (interruptMask & BMA456W_NO_MOT_INT) {
-        return BMA456_INT_NO_MOT;
+        return BMA456_interrupt::NO_MOT;
     }
     if (interruptMask & BMA456W_ERROR_INT) {
-        return BMA456_INT_ERROR_INT;
+        return BMA456_interrupt::ERROR_INT;
     }
 
-    return BMA456_INT_NONE;
+    return BMA456_interrupt::NONE;
 }
 
 bool BMA456::setInterruptEnable(uint8_t interruptPin, uint16_t int_map, bool enable)
@@ -461,25 +461,25 @@ bool BMA456::setErrorInterruptEnable(bool en)
  * @return activity_t current activity
  * @retval ACTIVITY_ERROR -> error retrieving activity
  */
-activity_t BMA456::getActivity()
+BMA456_activity BMA456::getActivity()
 {
     uint8_t userActivity = -1;
     bma456w_activity_output(&userActivity, &bma);
     switch (userActivity) {
     case BMA456W_USER_STATIONARY:
-        return ACTIVITY_STATIONARY;
+        return BMA456_activity::STATIONARY;
         break;
     case BMA456W_USER_WALKING:
-        return ACTIVITY_WALKING;
+        return BMA456_activity::WALKING;
         break;
     case BMA456W_USER_RUNNING:
-        return ACTIVITY_RUNNING;
+        return BMA456_activity::RUNNING;
         break;
     case BMA456W_STATE_INVALID:
-        return ACTIVITY_INVALID;
+        return BMA456_activity::INVALID;
         break;
     default:
-        return ACTIVITY_ERROR;
+        return BMA456_activity::ERROR;
         break;
     }
 }

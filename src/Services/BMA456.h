@@ -4,34 +4,34 @@
 #include <Wire.h>
 #include <bma456w.h>
 
-typedef enum {
-    ORIENTATION_ERROR,
-    ORIENTATION_TOP_EDGE_UP,
-    ORIENTATION_BOTTOM_EDGE_UP,
-    ORIENTATION_LEFT_EDGE_UP,
-    ORIENTATION_RIGHT_EDGE_UP,
-    ORIENTATION_DISP_UP,
-    ORIENTATION_DISP_DOWN,
-} orientation_t;
+enum class BMA456_orientation {
+    ERROR,
+    TOP_EDGE_UP,
+    BOTTOM_EDGE_UP,
+    LEFT_EDGE_UP,
+    RIGHT_EDGE_UP,
+    DISP_UP,
+    DISP_DOWN,
+};
 
-typedef enum {
-    ACTIVITY_STATIONARY,
-    ACTIVITY_WALKING,
-    ACTIVITY_RUNNING,
-    ACTIVITY_INVALID,
-    ACTIVITY_ERROR
-} activity_t;
+enum class BMA456_activity {
+    STATIONARY,
+    WALKING,
+    RUNNING,
+    INVALID,
+    ERROR
+};
 
-typedef enum { // does not handle simultanious interrupts
-    BMA456_INT_NONE,
-    BMA456_INT_STEP_CNTR,
-    BMA456_INT_ACTIVITY,
-    BMA456_INT_WRIST_WEAR,
-    BMA456_INT_ANY_MOT,
-    BMA456_INT_NO_MOT,
-    BMA456_INT_ERROR_INT, // bma456 error interrupt
-    BMA456_INT_ERROR, // interrupt while retrieving interrupt
-} bma456_interrupt_t;
+enum class BMA456_interrupt { // does not handle simultanious interrupts
+    NONE,
+    STEP_CNTR,
+    ACTIVITY,
+    WRIST_WEAR,
+    ANY_MOT,
+    NO_MOT,
+    ERROR_INT, // bma456 error interrupt
+    ERROR, // interrupt while retrieving interrupt
+};
 
 class BMA456 {
 private:
@@ -78,7 +78,7 @@ public:
     void disablePowerSave();
     bool selfTest();
 
-    orientation_t getOrientation(); // Same as original except it is orientated to show the proper higher edge on your Watchy.
+    BMA456_orientation getOrientation(); // Same as original except it is orientated to show the proper higher edge on your Watchy.
     bool IsUp(); // Returns True if your Watchy is in the Tilt position (with flexible room).
 
     bool getAcceleration(struct bma4_accel& acc);
@@ -104,9 +104,9 @@ public:
     struct bma4_err_reg getErrorCode();
     uint32_t getSensorTime();
 
-    activity_t getActivity();
+    BMA456_activity getActivity();
 
-    bma456_interrupt_t getInterrupt();
+    BMA456_interrupt getInterrupt();
     bool setStepCountInterruptEnable(bool en = true);
     bool setWristInterruptEnable(bool en = true);
     bool setAnyMotionInterruptEnable(bool en = true);
