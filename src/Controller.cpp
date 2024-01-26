@@ -1,31 +1,33 @@
 #include "Controller.h"
 #include "Services/BMA456.h"
+#include "constants.h"
 #include <esp32-hal.h>
 #include <esp_sleep.h>
 
 RTC_DATA_ATTR bool initialBoot = true;
 
-Controller* Controller::instancePointer = NULL;
-
-Controller::Controller(pin_config_t pinConfiguration)
+Controller::Controller()
 {
-    pinConfig = pinConfiguration;
+
     // handle initialBoot (wakeup after flashing)
     if (initialBoot) {
         // initialize sensors
-        BMA456::getInstance().init(pinConfig.bmaInt1, pinConfig.bmaInt2);
+        BMA456::getInstance().init();
+
+        initialBoot = false;
     }
 
     // configure wake up pins
-    uint64_t wakeupPinMask;
-    wakeupPinMask |= (1 << pinConfig.button1);
-    wakeupPinMask |= (1 << pinConfig.button2);
-    wakeupPinMask |= (1 << pinConfig.button3);
-    wakeupPinMask |= (1 << pinConfig.button4);
-    wakeupPinMask |= (1 << pinConfig.bmaInt1);
+    uint64_t wakeupPinMask = 0;
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON1);
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON2);
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON3);
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON4);
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BMA_INT1);
+    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BMA_INT2);
 
     // wake up on RTC interrupt (active low)
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)pinConfig.rtcInt, LOW);
+    esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
     // wake up on any button press or BMA456 interrupt(active high)
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
@@ -56,14 +58,6 @@ void Controller::handleWakeup()
 
 Controller& Controller::getInstance()
 {
-    // TODO: insert return statement here
-    return *instancePointer;
-}
-
-Controller& Controller::createInstance(const pin_config_t pinConfiguration)
-{
-    if (instancePointer == NULL) {
-        instancePointer = new Controller(pinConfiguration);
-    }
-    return *instancePointer;
+    static Controller instance;
+    return instance;
 }

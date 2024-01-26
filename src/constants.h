@@ -11,3 +11,15 @@ constexpr size_t MAX_CREDENTIALS = 8;
 namespace CONST_MENU {
 constexpr size_t MAX_MENU_SIZE = 8;
 }
+
+namespace CONST_PIN {
+constexpr uint8_t BUTTON1 = 26;
+constexpr uint8_t BUTTON2 = 25;
+constexpr uint8_t BUTTON3 = 35;
+constexpr uint8_t BUTTON4 = 4;
+
+constexpr uint8_t RTC_INT = 27;
+
+constexpr uint8_t BMA_INT1 = 14;
+constexpr uint8_t BMA_INT2 = 12;
+}

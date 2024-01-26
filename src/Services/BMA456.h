@@ -71,7 +71,7 @@ public:
     BMA456(const BMA456&) = delete;
     void operator=(const BMA456&) = delete;
 
-    bool init(uint8_t pinInt1, uint8_t pinInt2); // Same as original but requires an RTCType from WatchyRTC or SmallRTC.
+    bool init(); // Same as original but requires an RTCType from WatchyRTC or SmallRTC.
 
     void softReset();
     void enablePowerSave();

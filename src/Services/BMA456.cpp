@@ -15,10 +15,8 @@ BMA456::BMA456()
 /// @return success of initialization
 /// @retval true -> initialization successfull
 /// @retval false -> initialization failed
-bool BMA456::init(uint8_t pinInt1, uint8_t pinInt2)
+bool BMA456::init()
 {
-    PIN_BMA_INT1 = pinInt1;
-    PIN_BMA_INT2 = pinInt2;
 
     bma.intf = BMA4_I2C_INTF;
     bma.variant = BMA45X_VARIANT;

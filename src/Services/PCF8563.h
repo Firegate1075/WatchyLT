@@ -21,4 +21,6 @@ public:
     // remove copy constructor and assignment operator
     PCF8563(const PCF8563&) = delete;
     void operator=(const PCF8563&) = delete;
+
+    void init();
 };
