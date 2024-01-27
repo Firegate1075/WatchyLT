@@ -28,5 +28,5 @@ namespace CONST_WIFI {
 constexpr uint8_t MAX_OBSERVERS = 3;
 constexpr uint8_t portalTimeout = 60;
 constexpr uint8_t connectTimeout = 30;
-constexpr char* configurationPortalName = "Watchy-AP";
+constexpr const char* configurationPortalName = "Watchy-AP";
 }
