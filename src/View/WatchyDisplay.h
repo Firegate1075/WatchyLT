@@ -17,23 +17,22 @@
 #pragma once
 
 #include <GxEPD2_BW.h>
+#include <constants.h>
 
 class WatchyDisplay : public GxEPD2_EPD {
 public:
     // attributes
-    static const uint16_t WIDTH = 200;
-    static const uint16_t WIDTH_VISIBLE = WIDTH;
-    static const uint16_t HEIGHT = 200;
-    static const GxEPD2::Panel panel = GxEPD2::GDEH0154D67;
-    static const bool hasColor = false;
-    static const bool hasPartialUpdate = true;
-    static const bool hasFastPartialUpdate = true;
-    static const uint16_t power_on_time = 100; // ms, e.g. 95583us
-    static const uint16_t power_off_time = 150; // ms, e.g. 140621us
-    static const uint16_t full_refresh_time = 2600; // ms, e.g. 2509602us
-    static const uint16_t partial_refresh_time = 500; // ms, e.g. 457282us
-    // constructor
-    WatchyDisplay();
+    static const uint16_t WIDTH = CONST_DISPLAY::WIDTH;
+    static const uint16_t WIDTH_VISIBLE = CONST_DISPLAY::WIDTH_VISIBLE;
+    static const uint16_t HEIGHT = CONST_DISPLAY::HEIGHT;
+    static const GxEPD2::Panel panel = CONST_DISPLAY::panel;
+    static const bool hasColor = CONST_DISPLAY::hasColor;
+    static const bool hasPartialUpdate = CONST_DISPLAY::hasPartialUpdate;
+    static const bool hasFastPartialUpdate = CONST_DISPLAY::hasFastPartialUpdate;
+    static const uint16_t power_on_time = CONST_DISPLAY::power_on_time; // ms, e.g. 95583us
+    static const uint16_t power_off_time = CONST_DISPLAY::power_off_time; // ms, e.g. 140621us
+    static const uint16_t full_refresh_time = CONST_DISPLAY::full_refresh_time; // ms, e.g. 2509602us
+    static const uint16_t partial_refresh_time = CONST_DISPLAY::partial_refresh_time; // ms, e.g. 457282us
 
     static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> getDisplay()
     {
@@ -75,6 +74,9 @@ public:
 
     bool darkBorder = false; // adds a dark border outside the normal screen area
 private:
+    // make constructor private
+    WatchyDisplay();
+
     void _writeScreenBuffer(uint8_t command, uint8_t value);
     void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void _writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
@@ -89,9 +91,4 @@ private:
     void _Update_Part();
 
     void _transferCommand(uint8_t command);
-
-    const int16_t cs = 5;
-    const int16_t dc = 10;
-    const int16_t res = 9;
-    const int16_t busy = 19;
 };

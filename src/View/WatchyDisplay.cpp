@@ -16,10 +16,12 @@
 
 #include "WatchyDisplay.h"
 
+using namespace CONST_DISPLAY;
+
 WatchyDisplay::WatchyDisplay()
-    : GxEPD2_EPD(cs, dc, res, busy, HIGH, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
+    : GxEPD2_EPD(CONST_PIN::CS, CONST_PIN::DC, CONST_PIN::RES, CONST_PIN::BUSY, BUSY_LEVEL, BUSY_TIMEOUT, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
 {
-    selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0)); // Set SPI to 20Mhz (default is 4Mhz)
+    selectSPI(SPI, SPISettings(CONST_SPI::CLOCK, CONST_SPI::BIT_ORDER, CONST_SPI::DATA_MODE)); // Set SPI to 20Mhz (default is 4Mhz)
 }
 
 void WatchyDisplay::clearScreen(uint8_t value)
