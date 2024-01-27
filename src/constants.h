@@ -23,3 +23,10 @@ constexpr uint8_t RTC_INT = 27;
 constexpr uint8_t BMA_INT1 = 14;
 constexpr uint8_t BMA_INT2 = 12;
 }
+
+namespace CONST_WIFI {
+constexpr uint8_t MAX_OBSERVERS = 3;
+constexpr uint8_t portalTimeout = 60;
+constexpr uint8_t connectTimeout = 30;
+constexpr char* configurationPortalName = "Watchy-AP";
+}

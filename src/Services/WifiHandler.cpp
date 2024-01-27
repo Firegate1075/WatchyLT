@@ -9,9 +9,9 @@ void WifiHandler::initialize()
 {
     WiFi.mode(WIFI_STA);
     wifiManager.setConfigPortalBlocking(false);
-    wifiManager.setConfigPortalTimeout(portalTimeout); // setTimeout does the same thing.
+    wifiManager.setConfigPortalTimeout(CONST_WIFI::portalTimeout); // setTimeout does the same thing.
     wifiManager.setWiFiAutoReconnect(false);
-    wifiManager.setConnectTimeout(connectTimeout);
+    wifiManager.setConnectTimeout(CONST_WIFI::connectTimeout);
 
     wifiManager.setAPCallback(onAPStart);
     wifiManager.setSaveConfigCallback(onConfigSaveAndConnect);
@@ -61,6 +61,17 @@ void WifiHandler::onConfigPortalTimeout()
 }
 
 /**
+ * @brief Notifies observers about established WiFi connection
+ *
+ */
+void WifiHandler::observerCallback()
+{
+    for_each(observers.begin(), observers.end(), [](WifiObserver* observer) {
+        observer->wifiCallback();
+    });
+}
+
+/**
  * @brief Connect to WiFi with Credentials. This is always blocking.
  *
  * @param credentials The Credentials needed for the WiFi network
@@ -92,7 +103,7 @@ bool WifiHandler::disconnect()
  */
 bool WifiHandler::openConfigurationPortal()
 {
-    return wifiManager.startConfigPortal(configurationPortalName);
+    return wifiManager.startConfigPortal(CONST_WIFI::configurationPortalName);
 }
 
 /**
@@ -113,4 +124,31 @@ bool WifiHandler::closeConfigurationPortal()
 void WifiHandler::loop()
 {
     wifiManager.process();
+}
+
+/**
+ * @brief Attach observer for WifiEstablished connection
+ *
+ * @param observer Pointer to observer object
+ * @retval true -> success
+ * @retval false -> fail
+ */
+bool WifiHandler::attach(WifiObserver* observer)
+{
+    if (observers.full()) {
+        return false;
+    }
+
+    observers.push_back(observer);
+    return true;
+}
+
+/**
+ * @brief Detach observer
+ *
+ * @param observer
+ */
+void WifiHandler::detach(WifiObserver* observer)
+{
+    observers.remove(observer);
 }

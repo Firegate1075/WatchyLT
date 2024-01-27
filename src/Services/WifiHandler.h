@@ -1,7 +1,13 @@
 #pragma once
 
 #include "Models/CredentialModel.h"
+#include "WifiObserver.h"
+#include "constants.h"
+#include "etl/list.h"
 #include <WifiManager.h>
+
+using etl::for_each;
+using etl::list;
 
 class WifiHandler {
 private:
@@ -12,12 +18,11 @@ private:
     static void onAPStart(WiFiManager* wifiManager);
     static void onConfigSaveAndConnect();
     static void onConfigPortalTimeout();
+    static void observerCallback();
 
     WiFiManager wifiManager;
-
-    const uint8_t portalTimeout = 60;
-    const uint8_t connectTimeout = 30;
-    const char* configurationPortalName = "Watchy-AP";
+    static list<WifiObserver*, CONST_WIFI::MAX_OBSERVERS> observers;
+    static list<WifiObserver*, CONST_WIFI::MAX_OBSERVERS>::iterator observerIterator;
 
 protected:
 public:
@@ -38,4 +43,6 @@ public:
     bool openConfigurationPortal();
     bool closeConfigurationPortal();
     void loop();
+    bool attach(WifiObserver* observer);
+    void detach(WifiObserver* observer);
 };
