@@ -1,30 +1,27 @@
 #include "Controller.h"
-#include "Services/BMA456.h"
-#include "constants.h"
-#include <esp32-hal.h>
-#include <esp_sleep.h>
 
 RTC_DATA_ATTR bool initialBoot = true;
 
 Controller::Controller()
+    : rtc(PCF8563::getInstance())
 {
-
+    Wire.begin(SDA, SCL);
     // handle initialBoot (wakeup after flashing)
     if (initialBoot) {
         // initialize sensors
         BMA456::getInstance().init();
-
+        rtc.resetRTC();
         initialBoot = false;
     }
 
     // configure wake up pins
     uint64_t wakeupPinMask = 0;
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON1);
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON2);
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON3);
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BUTTON4);
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BMA_INT1);
-    wakeupPinMask |= ((uint64_t) 1 << CONST_PIN::BMA_INT2);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON1);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON2);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON3);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON4);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT1);
+    wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
     // wake up on RTC interrupt (active low)
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
@@ -32,6 +29,7 @@ Controller::Controller()
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
     // configure sensors (or maybe only before use ?)
+    esp_deep_sleep_start();
 }
 
 /**

@@ -16,10 +16,8 @@
 
 #include "WatchyDisplay.h"
 
-using namespace CONST_DISPLAY;
-
 WatchyDisplay::WatchyDisplay()
-    : GxEPD2_EPD(CONST_PIN::CS, CONST_PIN::DC, CONST_PIN::RES, CONST_PIN::BUSY, BUSY_LEVEL, BUSY_TIMEOUT, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
+    : GxEPD2_EPD(CONST_PIN::CS, CONST_PIN::DC, CONST_PIN::RES, CONST_PIN::BUSY, CONST_DISPLAY::BUSY_LEVEL, CONST_DISPLAY::BUSY_TIMEOUT, CONST_DISPLAY::WIDTH, CONST_DISPLAY::HEIGHT, CONST_DISPLAY::panel, CONST_DISPLAY::hasColor, CONST_DISPLAY::hasPartialUpdate, CONST_DISPLAY::hasFastPartialUpdate)
 {
     selectSPI(SPI, SPISettings(CONST_SPI::CLOCK, CONST_SPI::BIT_ORDER, CONST_SPI::DATA_MODE)); // Set SPI to 20Mhz (default is 4Mhz)
 }

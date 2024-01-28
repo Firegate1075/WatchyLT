@@ -1,6 +1,11 @@
 #pragma once
+#include "Services/BMA456.h"
+#include "Services/PCF8563.h"
+#include "constants.h"
 #include <Arduino.h>
 #include <esp32-hal.h>
+#include <esp_sleep.h>
+#include <Wire.h>
 
 /// @brief Controller class for Watchy
 class Controller {
@@ -10,6 +15,8 @@ private:
     ~Controller() { }
 
     void handleWakeup();
+
+    PCF8563& rtc;
 
 protected:
 public:

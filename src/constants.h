@@ -59,3 +59,7 @@ constexpr uint32_t CLOCK = 20000000;
 constexpr uint8_t BIT_ORDER = MSBFIRST;
 constexpr uint8_t DATA_MODE = SPI_MODE0;
 }
+
+namespace CONST_RTC {
+constexpr uint8_t CENTURY = 0; // 0 = 2000; 1 = 1900;
+}

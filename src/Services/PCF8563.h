@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Rtc_Pcf8563.h>
+#include <TimeLib.h>
+#include <constants.h>
 
 class PCF8563 {
 private:
@@ -22,5 +24,9 @@ public:
     PCF8563(const PCF8563&) = delete;
     void operator=(const PCF8563&) = delete;
 
-    void init();
+    void resetRTC();
+    void setTimeDate(tmElements_t tm);
+    void getTimeDate(tmElements_t& tm);
+    void resetAlarm();
+    char* formatTime();
 };
