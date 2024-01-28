@@ -5,8 +5,10 @@ RTC_DATA_ATTR bool initialBoot = true;
 Controller::Controller()
     : rtc(PCF8563::getInstance())
 {
+    Serial.begin(115200); // for debug
     Wire.begin(SDA, SCL);
     // handle initialBoot (wakeup after flashing)
+    initialBoot = true; // for debug
     if (initialBoot) {
         // initialize sensors
         BMA456::getInstance().init();
@@ -27,6 +29,8 @@ Controller::Controller()
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
     // wake up on any button press or BMA456 interrupt(active high)
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
+
+    delay(1000);
 
     // configure sensors (or maybe only before use ?)
     esp_deep_sleep_start();

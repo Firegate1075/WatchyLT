@@ -63,3 +63,7 @@ constexpr uint8_t DATA_MODE = SPI_MODE0;
 namespace CONST_RTC {
 constexpr uint8_t CENTURY = 0; // 0 = 2000; 1 = 1900;
 }
+
+namespace CONST_BMA {
+constexpr uint8_t BMA456_DEVICE_ADDR = 0x18;
+}

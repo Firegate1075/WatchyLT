@@ -579,7 +579,7 @@ int8_t BMA456::bma4_interface_i2c_init(struct bma4_dev* bma)
         bma->bus_write = bmi4xx_hal_i2c_bus_write;
 
         /* Assign device address to interface pointer */
-        bma->intf_ptr = &BMA456_DEVICE_ADDR;
+        bma->intf_ptr = &bma_i2c_adress;
 
         /* Assign Variant */
         bma->variant = BMA45X_VARIANT;

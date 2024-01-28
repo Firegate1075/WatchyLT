@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include <bma456w.h>
@@ -40,9 +41,7 @@ private:
     ~BMA456() { }
 
     struct bma4_dev bma;
-    uint8_t PIN_BMA_INT1;
-    uint8_t PIN_BMA_INT2;
-    uint8_t BMA456_DEVICE_ADDR;
+    uint8_t bma_i2c_adress = CONST_BMA::BMA456_DEVICE_ADDR;
 
     int8_t BMA456_read_i2c(uint8_t dev_addr, uint8_t reg_addr, uint8_t* reg_data, uint16_t count);
     int8_t BMA456_write_i2c(uint8_t dev_addr, uint8_t reg_addr, uint8_t* reg_data, uint16_t count);
