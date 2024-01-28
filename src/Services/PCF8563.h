@@ -1,8 +1,17 @@
 #pragma once
 
 #include <Rtc_Pcf8563.h>
-#include <TimeLib.h>
 #include <constants.h>
+
+typedef struct {
+    uint8_t Second;
+    uint8_t Minute;
+    uint8_t Hour;
+    uint8_t Weekday;
+    uint8_t Day;
+    uint8_t Month;
+    uint8_t Year;
+} pcfTime;
 
 class PCF8563 {
 private:
@@ -25,8 +34,8 @@ public:
     void operator=(const PCF8563&) = delete;
 
     void resetRTC();
-    void setTimeDate(tmElements_t tm);
-    void getTimeDate(tmElements_t& tm);
+    void setTimeDate(pcfTime tm);
+    void getTimeDate(pcfTime& tm);
     void resetAlarm();
     char* formatTime();
 };

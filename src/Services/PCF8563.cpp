@@ -18,14 +18,12 @@ void PCF8563::resetRTC()
  *
  * @param tm -> Struct containing time and date
  */
-void PCF8563::setTimeDate(tmElements_t tm)
+void PCF8563::setTimeDate(pcfTime tm)
 {
     // time_t t = makeTime(tm);
     // breakTime(t, tm);
 
-    rtc.setDate(tm.Day, tm.Wday - 1, tm.Month, CONST_RTC::CENTURY, tmYearToY2k(tm.Year));
-    Serial.print("Hour: ");
-    Serial.println(tm.Hour);
+    rtc.setDate(tm.Day, tm.Weekday, tm.Month, CONST_RTC::CENTURY, tm.Year);
     rtc.setTime(tm.Second, tm.Minute, tm.Hour);
     resetAlarm();
 }
@@ -35,13 +33,13 @@ void PCF8563::setTimeDate(tmElements_t tm)
  *
  * @param tm -> Struct which will contain retrieved time and date
  */
-void PCF8563::getTimeDate(tmElements_t& tm)
+void PCF8563::getTimeDate(pcfTime& tm)
 {
     rtc.getDate();
 
     tm.Year = rtc.getYear();
     tm.Month = rtc.getMonth();
-    tm.Wday = rtc.getWeekday() + 1;
+    tm.Weekday = rtc.getWeekday();
 
     tm.Day = rtc.getDay();
     tm.Hour = rtc.getHour();
