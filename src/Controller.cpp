@@ -16,6 +16,8 @@ Controller::Controller()
         initialBoot = false;
     }
 
+    // TODO: set pin modes
+
     // configure wake up pins
     uint64_t wakeupPinMask = 0;
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON1);
