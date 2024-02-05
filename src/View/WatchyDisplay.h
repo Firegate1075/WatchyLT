@@ -77,6 +77,7 @@ private:
     // make constructor private
     WatchyDisplay();
 
+    static void busyCallback(const void *);
     void _writeScreenBuffer(uint8_t command, uint8_t value);
     void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void _writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,

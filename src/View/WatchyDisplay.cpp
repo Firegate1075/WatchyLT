@@ -20,6 +20,7 @@ WatchyDisplay::WatchyDisplay()
     : GxEPD2_EPD(CONST_PIN::CS, CONST_PIN::DC, CONST_PIN::RES, CONST_PIN::BUSY, CONST_DISPLAY::BUSY_LEVEL, CONST_DISPLAY::BUSY_TIMEOUT, CONST_DISPLAY::WIDTH, CONST_DISPLAY::HEIGHT, CONST_DISPLAY::panel, CONST_DISPLAY::hasColor, CONST_DISPLAY::hasPartialUpdate, CONST_DISPLAY::hasFastPartialUpdate)
 {
     selectSPI(SPI, SPISettings(CONST_SPI::CLOCK, CONST_SPI::BIT_ORDER, CONST_SPI::DATA_MODE)); // Set SPI to 20Mhz (default is 4Mhz)
+    setBusyCallback(busyCallback);
 }
 
 void WatchyDisplay::clearScreen(uint8_t value)
@@ -302,6 +303,13 @@ void WatchyDisplay::hibernate()
         _writeData(0x1); // enter deep sleep
         _hibernating = true;
     }
+}
+
+void WatchyDisplay::busyCallback(const void*)
+{
+    gpio_wakeup_enable((gpio_num_t)CONST_PIN::BUSY, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+    esp_light_sleep_start();
 }
 
 void WatchyDisplay::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h)

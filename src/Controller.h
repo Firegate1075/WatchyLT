@@ -1,11 +1,13 @@
 #pragma once
 #include "Services/BMA456.h"
 #include "Services/PCF8563.h"
+#include "View/WatchyDisplay.h"
+#include "View/Metropolis_Font.h"
 #include "constants.h"
 #include <Arduino.h>
+#include <Wire.h>
 #include <esp32-hal.h>
 #include <esp_sleep.h>
-#include <Wire.h>
 
 /// @brief Controller class for Watchy
 class Controller {

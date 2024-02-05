@@ -36,6 +36,7 @@ void PCF8563::setTimeDate(pcfTime tm)
 void PCF8563::getTimeDate(pcfTime& tm)
 {
     rtc.getDate();
+    rtc.getTime();
 
     tm.Year = rtc.getYear();
     tm.Month = rtc.getMonth();
@@ -54,6 +55,7 @@ void PCF8563::getTimeDate(pcfTime& tm)
 void PCF8563::resetAlarm()
 {
     rtc.clearAlarm();
+    rtc.getTime();
     uint8_t nextAlarmMin = rtc.getMinute() + 1;
     if (nextAlarmMin == 60) {
         nextAlarmMin = 0;
