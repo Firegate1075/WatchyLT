@@ -6,6 +6,7 @@
 void setup()
 {
     // create Controller instance
+    Serial.begin(115200);
     Controller& controller = Controller::getInstance();
 }
 

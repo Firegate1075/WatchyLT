@@ -28,6 +28,8 @@ constexpr int16_t CS = 5;
 constexpr int16_t DC = 10;
 constexpr int16_t RES = 9;
 constexpr int16_t BUSY = 19;
+
+constexpr u_int8_t BATT_ADC = 34;
 }
 
 namespace CONST_WIFI {

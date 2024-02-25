@@ -1,13 +1,36 @@
 #include "View.h"
 #include "Menus/MenuComponent.h"
+#include "WatchFace.h"
 
 View::View()
+    : screen(WatchyDisplay::getDisplay())
 {
+    Serial.println("View constructor");
+    Serial.flush();
+    //WatchFace* watchFace = new WatchFace();
+    //currentEntry = watchFace;
+    Serial.println("View constructor END");
+    Serial.flush();
+}
+
+void View::init(bool initialBoot)
+{
+    screen.init(0, initialBoot, 10, true);
+    screen.setFullWindow();
+    if (initialBoot) {
+        screen.fillScreen(GxEPD_BLACK);
+        screen.setTextColor(GxEPD_WHITE);
+    }
 }
 
 void View::updateDisplay()
 {
     currentEntry->display();
+}
+
+void View::endScreen()
+{
+    screen.hibernate();
 }
 
 void View::handleButtons()

@@ -34,8 +34,10 @@ public:
     static const uint16_t full_refresh_time = CONST_DISPLAY::full_refresh_time; // ms, e.g. 2509602us
     static const uint16_t partial_refresh_time = CONST_DISPLAY::partial_refresh_time; // ms, e.g. 457282us
 
-    static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> getDisplay()
+    static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& getDisplay()
     {
+        Serial.println("GetDisplay");
+        Serial.flush();
         static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> display = WatchyDisplay();
         return display;
     }
@@ -77,7 +79,7 @@ private:
     // make constructor private
     WatchyDisplay();
 
-    static void busyCallback(const void *);
+    static void busyCallback(const void*);
     void _writeScreenBuffer(uint8_t command, uint8_t value);
     void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void _writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,

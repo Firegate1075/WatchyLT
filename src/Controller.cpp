@@ -1,42 +1,32 @@
 #include "Controller.h"
 
 RTC_DATA_ATTR bool initialBoot = true;
-RTC_DATA_ATTR u_int8_t counter = 0;
 
 Controller::Controller()
     : rtc(PCF8563::getInstance())
+    , gpio(GPIOHandler::getInstance())
+    , viewObj(View::getInstance())
 {
-    Serial.begin(115200); // for debug
     Wire.begin(SDA, SCL);
+
+    debugPrint("Initial boot: ");
+    debugPrintln(initialBoot);
+
+    // view.init(initialBoot);
+
     // handle initialBoot (wakeup after flashing)
-
-    Serial.print("Initial boot: ");
-    Serial.println(initialBoot);
-
-    GxEPD2_BW<WatchyDisplay, (uint16_t)200U> display = WatchyDisplay::getDisplay();
-    display.init(0, initialBoot, 10, true);
-    display.setFullWindow();
-
     if (initialBoot) {
         // initialize sensors
-        display.fillScreen(GxEPD_BLACK);
-        display.setTextColor(GxEPD_WHITE);
+
+        // BMA needs small delay to be setup correctly
+        delay(1000);
+
         BMA456::getInstance().init();
         rtc.resetRTC();
     }
 
     rtc.resetAlarm();
-    counter++;
-    pcfTime td;
-    rtc.getTimeDate(td);
 
-    display.setFont(&Metropolis_Black11pt7b);
-    display.setCursor(100, 100);
-    display.println(String(counter).c_str());
-    display.println(String(td.Hour).c_str());
-    display.println(String(td.Minute).c_str());
-    display.println(String(td.Second).c_str());
-    display.display(!initialBoot);
     // TODO: set pin modes
 
     // configure wake up pins
@@ -48,6 +38,7 @@ Controller::Controller()
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT1);
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
+    // view.updateDisplay();
     handleWakeup();
 
     // wake up on RTC interrupt (active low)
@@ -56,7 +47,7 @@ Controller::Controller()
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
     initialBoot = false;
-    display.hibernate();
+    // view.endScreen();
     delay(1000);
 
     // configure sensors (or maybe only before use ?)
@@ -74,16 +65,16 @@ void Controller::handleWakeup()
 
     switch (cause) {
     case ESP_SLEEP_WAKEUP_EXT0:
-        Serial.println("RTC Wakeup");
+        debugPrintln("RTC Wakeup");
         // RTC wakeup
         break;
     case ESP_SLEEP_WAKEUP_EXT1:
-        Serial.println("Button or BMA");
+        debugPrintln("Button or BMA");
         // button interrupt or bma interrupt
         break;
     default:
-        Serial.print("unexpected wakeup: ");
-        Serial.println(cause);
+        debugPrint("unexpected wakeup: ");
+        debugPrintln(cause);
         // error: unexpected wakeup
         break;
     }
