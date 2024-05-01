@@ -1,6 +1,6 @@
 #include "Controller.h"
 
-RTC_DATA_ATTR bool initialBoot = true;
+RTC_DATA_ATTR bool initialBoot = true; // TODO: maybe move to dedicated repo / data object
 
 Controller::Controller()
     : rtc(PCF8563::getInstance())
@@ -24,8 +24,6 @@ Controller::Controller()
         BMA456::getInstance().init();
         rtc.resetRTC();
     }
-
-    rtc.resetAlarm();
 
     // TODO: set pin modes
 
@@ -62,14 +60,21 @@ void Controller::handleWakeup()
 {
     // retrieve cause of wakeup
     esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+    BMA456_interrupt bma_interrupt = BMA456::getInstance().getInterrupt();
 
     switch (cause) {
     case ESP_SLEEP_WAKEUP_EXT0:
         debugPrintln("RTC Wakeup");
+        rtc.resetAlarm();
+
         // RTC wakeup
         break;
     case ESP_SLEEP_WAKEUP_EXT1:
-        debugPrintln("Button or BMA");
+        if (bma_interrupt != BMA456_interrupt::NONE) {
+            debugPrintln("BMA wakeup");
+        } else {
+            debugPrintln("Button wakeup");
+        }
         // button interrupt or bma interrupt
         break;
     default:

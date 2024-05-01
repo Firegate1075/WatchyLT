@@ -9,6 +9,10 @@
 
 BMA456::BMA456()
 {
+    // Initialize bma456 struct
+    bma.intf = BMA4_I2C_INTF;
+    bma.variant = BMA45X_VARIANT;
+    bma4_interface_i2c_init(&bma);
 }
 
 /// @brief Initializes BMA456 after reset
