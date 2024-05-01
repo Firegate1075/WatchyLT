@@ -24,5 +24,8 @@ public:
     MenuComponent* getPreviousItem();
 
     virtual void handleEnterButton();
+    virtual void handleBackButton() {};
+    virtual void handleUpButton() {};
+    virtual void handleDownButton() {};
     virtual void display();
 };

@@ -36,8 +36,8 @@ Controller::Controller()
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT1);
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
-    viewObj.updateDisplay();
     handleWakeup();
+    viewObj.updateDisplay();
 
     // wake up on RTC interrupt (active low)
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
@@ -46,7 +46,6 @@ Controller::Controller()
 
     initialBoot = false;
     viewObj.endScreen();
-    delay(1000);
 
     // configure sensors (or maybe only before use ?)
     esp_deep_sleep_start();
@@ -74,12 +73,14 @@ void Controller::handleWakeup()
             debugPrintln("BMA wakeup");
         } else {
             debugPrintln("Button wakeup");
+            viewObj.handleButtons();
         }
         // button interrupt or bma interrupt
         break;
     default:
         debugPrint("unexpected wakeup: ");
         debugPrintln(cause);
+
         // error: unexpected wakeup
         break;
     }

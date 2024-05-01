@@ -61,6 +61,4 @@ void WatchFace::display()
     screen.setFont(&Metropolis_Black11pt7b);
     screen.print(gpio.getBatteryVoltage());
     screen.println("V");
-
-    screen.display(false);
 }

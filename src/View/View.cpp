@@ -2,6 +2,8 @@
 #include "Menus/MenuComponent.h"
 #include "WatchFace.h"
 
+RTC_DATA_ATTR bool canDoPartitialRefresh = false;
+
 View::View()
     : screen(WatchyDisplay::getDisplay())
 {
@@ -28,6 +30,8 @@ void View::init(bool initialBoot)
 void View::updateDisplay()
 {
     currentEntry->display();
+    screen.display(canDoPartitialRefresh);
+    canDoPartitialRefresh = true;
 }
 
 void View::endScreen()
@@ -44,15 +48,19 @@ void View::handleButtons()
     bool button4pressed = digitalRead(CONST_PIN::BUTTON4); // button4 = down
 
     if (button1pressed) {
+        Serial.println("Handle Button 1 in View");
         currentEntry->handleBackButton();
     }
     if (button2pressed) {
+        Serial.println("Handle Button 2 in View");
         currentEntry->handleEnterButton();
     }
     if (button3pressed) {
+        Serial.println("Handle Button 3 in View");
         currentEntry->handleUpButton();
     }
     if (button4pressed) {
+        Serial.println("Handle Button 4 in View");
         currentEntry->handleDownButton();
     }
 }
@@ -60,4 +68,5 @@ void View::handleButtons()
 void View::setCurrentMenuEntry(MenuComponent* newEntry)
 {
     currentEntry = newEntry;
+    canDoPartitialRefresh = false;
 }
