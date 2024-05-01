@@ -12,7 +12,7 @@ Controller::Controller()
     debugPrint("Initial boot: ");
     debugPrintln(initialBoot);
 
-    // view.init(initialBoot);
+    viewObj.init(initialBoot);
 
     // handle initialBoot (wakeup after flashing)
     if (initialBoot) {
@@ -36,7 +36,7 @@ Controller::Controller()
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT1);
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
-    // view.updateDisplay();
+    viewObj.updateDisplay();
     handleWakeup();
 
     // wake up on RTC interrupt (active low)
@@ -45,7 +45,7 @@ Controller::Controller()
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
     initialBoot = false;
-    // view.endScreen();
+    viewObj.endScreen();
     delay(1000);
 
     // configure sensors (or maybe only before use ?)

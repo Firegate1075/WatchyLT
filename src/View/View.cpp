@@ -7,20 +7,22 @@ View::View()
 {
     Serial.println("View constructor");
     Serial.flush();
-    //WatchFace* watchFace = new WatchFace();
-    //currentEntry = watchFace;
+    WatchFace* watchFace = nullptr; // Init to nullptr, else code gets stuck here
     Serial.println("View constructor END");
     Serial.flush();
 }
 
 void View::init(bool initialBoot)
 {
+    Serial.println("View init");
     screen.init(0, initialBoot, 10, true);
     screen.setFullWindow();
+    currentEntry = new WatchFace();
     if (initialBoot) {
         screen.fillScreen(GxEPD_BLACK);
         screen.setTextColor(GxEPD_WHITE);
     }
+    Serial.println("View init END");
 }
 
 void View::updateDisplay()
