@@ -5,14 +5,11 @@ RTC_DATA_ATTR bool initialBoot = true; // TODO: maybe move to dedicated repo / d
 Controller::Controller()
     : rtc(PCF8563::getInstance())
     , gpio(GPIOHandler::getInstance())
-    , viewObj(View::getInstance())
 {
     Wire.begin(SDA, SCL);
 
     debugPrint("Initial boot: ");
     debugPrintln(initialBoot);
-
-    viewObj.init(initialBoot);
 
     // handle initialBoot (wakeup after flashing)
     if (initialBoot) {
@@ -37,7 +34,7 @@ Controller::Controller()
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
     handleWakeup();
-    viewObj.updateDisplay();
+    // viewObj.updateDisplay();
 
     // wake up on RTC interrupt (active low)
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
@@ -45,7 +42,7 @@ Controller::Controller()
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
     initialBoot = false;
-    viewObj.endScreen();
+    // viewObj.endScreen();
 
     // configure sensors (or maybe only before use ?)
     esp_deep_sleep_start();
@@ -73,7 +70,7 @@ void Controller::handleWakeup()
             debugPrintln("BMA wakeup");
         } else {
             debugPrintln("Button wakeup");
-            viewObj.handleButtons();
+            // viewObj.handleButtons();
         }
         // button interrupt or bma interrupt
         break;

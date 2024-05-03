@@ -23,15 +23,15 @@ enum class BMA456_activity {
     ERROR
 };
 
-enum class BMA456_interrupt { // does not handle simultanious interrupts
-    NONE,
-    STEP_CNTR,
-    ACTIVITY,
-    WRIST_WEAR,
-    ANY_MOT,
-    NO_MOT,
-    ERROR_INT, // bma456 error interrupt
-    ERROR, // interrupt while retrieving interrupt
+enum class BMA456_interrupt {
+    NONE = 0x01,
+    STEP_CNTR = 0x02,
+    ACTIVITY = 0x04,
+    WRIST_WEAR = 0x08,
+    ANY_MOT = 0x10,
+    NO_MOT = 0x20,
+    ERROR_INT = 0x40, // bma456 error interrupt
+    ERROR = 0x80, // interrupt while retrieving interrupt
 };
 
 class BMA456 {

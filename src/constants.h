@@ -69,3 +69,7 @@ constexpr uint8_t CENTURY = 0; // 0 = 2000; 1 = 1900;
 namespace CONST_BMA {
 constexpr uint8_t BMA456_DEVICE_ADDR = 0x18;
 }
+
+enum class VIEW_STATE {
+    WATCHFACE
+};

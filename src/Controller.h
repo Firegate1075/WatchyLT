@@ -2,8 +2,6 @@
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"
-#include "View/Metropolis_Font.h"
-#include "View/View.h"
 #include "constants.h"
 #include <Arduino.h>
 #include <Wire.h>
@@ -38,7 +36,6 @@ private:
 
     PCF8563& rtc;
     GPIOHandler& gpio;
-    View& viewObj;
 
 protected:
 public:
