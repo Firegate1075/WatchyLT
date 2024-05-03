@@ -1,7 +1,7 @@
 #include "StateRepository.h"
 
-RTC_DATA_ATTR bool initialBootRaw;
-RTC_DATA_ATTR VIEW_STATE viewStateRaw;
+RTC_DATA_ATTR bool initialBootRaw = true;
+RTC_DATA_ATTR VIEW_STATE viewStateRaw = VIEW_STATE::WATCHFACE;
 
 StateRepository::StateRepository()
 {

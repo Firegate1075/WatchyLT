@@ -3,7 +3,6 @@
 #include "constants.h"
 #include <Models/StateModel.h>
 #include <esp32-hal.h>
-#include <etl/vector.h>
 
 class StateRepository {
 private:
