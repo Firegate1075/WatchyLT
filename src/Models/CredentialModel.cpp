@@ -1,11 +1,11 @@
 #include "CredentialModel.h"
 
-string<SSID_LEN> CredentialModel::getSSID()
+string<SSID_LEN> CredentialModel::getSSID() const
 {
     return ssid;
 }
 
-string<PASS_LEN> CredentialModel::getPassword()
+string<PASS_LEN> CredentialModel::getPassword() const
 {
     return password;
 }

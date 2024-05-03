@@ -1,7 +1,5 @@
 #include "Controller.h"
 
-RTC_DATA_ATTR bool initialBoot = true; // TODO: maybe move to dedicated repo / data object
-
 Controller::Controller()
     : rtc(PCF8563::getInstance())
     , gpio(GPIOHandler::getInstance())
@@ -9,10 +7,10 @@ Controller::Controller()
     Wire.begin(SDA, SCL);
 
     debugPrint("Initial boot: ");
-    debugPrintln(initialBoot);
+    debugPrintln(StateRepository::getInstance().load().getInitialBoot());
 
     // handle initialBoot (wakeup after flashing)
-    if (initialBoot) {
+    if (StateRepository::getInstance().load().getInitialBoot()) {
         // initialize sensors
 
         // BMA needs small delay to be setup correctly
@@ -41,7 +39,9 @@ Controller::Controller()
     // wake up on any button press or BMA456 interrupt(active high)
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
-    initialBoot = false;
+    StateModel stateModel = StateRepository::getInstance().load();
+    stateModel.setInitialBoot(false);
+    StateRepository::getInstance().save(stateModel.setInitialBoot(false));
     // viewObj.endScreen();
 
     // configure sensors (or maybe only before use ?)

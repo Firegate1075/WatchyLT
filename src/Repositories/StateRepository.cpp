@@ -25,7 +25,7 @@ const StateModel& StateRepository::load()
     return model;
 }
 
-StateRepository& StateRepository::getInstace()
+StateRepository& StateRepository::getInstance()
 {
     static StateRepository instance;
     return instance;

@@ -17,8 +17,8 @@ private:
 
 protected:
 public:
-    string<SSID_LEN> getSSID();
-    string<PASS_LEN> getPassword();
+    string<SSID_LEN> getSSID() const;
+    string<PASS_LEN> getPassword() const;
 
     void setSSID(string<SSID_LEN> ssid);
     void setPassword(string<PASS_LEN> password);

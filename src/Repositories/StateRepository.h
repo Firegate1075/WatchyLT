@@ -17,7 +17,7 @@ protected:
 public:
     StateRepository(const StateRepository&) = delete;
     void operator=(const StateRepository&) = delete;
-    static StateRepository& getInstace();
+    static StateRepository& getInstance();
 
     const StateModel& load();
     void save(StateModel& stateModel);

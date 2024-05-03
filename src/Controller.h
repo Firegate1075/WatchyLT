@@ -1,4 +1,5 @@
 #pragma once
+#include "Repositories/StateRepository.h"
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"

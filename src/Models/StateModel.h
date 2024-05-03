@@ -13,9 +13,9 @@ private:
 
 protected:
 public:
-    bool getInitialBoot();
-    VIEW_STATE getViewState();
+    bool getInitialBoot() const;
+    VIEW_STATE getViewState() const;
 
-    void setInitialBoot(bool initialBoot);
-    void setViewState(VIEW_STATE viewState);
+    StateModel& setInitialBoot(bool initialBoot);
+    StateModel& setViewState(VIEW_STATE viewState);
 };

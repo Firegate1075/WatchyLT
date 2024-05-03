@@ -37,7 +37,7 @@ const etl::vector<CredentialModel, MAX_CREDENTIALS>& CredentialRepository::loadA
     return modelVector;
 }
 
-CredentialRepository& CredentialRepository::getInstace()
+CredentialRepository& CredentialRepository::getInstance()
 {
     static CredentialRepository instance;
     return instance;

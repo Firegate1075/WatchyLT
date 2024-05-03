@@ -22,7 +22,7 @@ protected:
 public:
     CredentialRepository(const CredentialRepository&) = delete;
     void operator=(const CredentialRepository&) = delete;
-    static CredentialRepository& getInstace();
+    static CredentialRepository& getInstance();
 
     const etl::vector<CredentialModel, MAX_CREDENTIALS>& loadAll();
     bool save(CredentialModel&);
