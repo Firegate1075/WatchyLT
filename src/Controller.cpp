@@ -19,6 +19,7 @@ Controller::Controller()
 
         BMA456::getInstance().init();
         rtc.resetRTC();
+        rtc.resetAlarm();
     }
 
     // TODO: set pin modes
