@@ -2,15 +2,14 @@
 
 #include "Metropolis_Font.h"
 #include "WatchyDisplay.h"
-#include <etl/vector.h>
-
-using CONST_MENU::MAX_MENU_SIZE;
+#include "constants.h"
+#include <etl/string.h>
 
 class WatchFace {
 private:
-    GxEPD2_BW<WatchyDisplay, (uint16_t)200U>& screen;
+    GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen;
 
 public:
     WatchFace();
-    void display();
+    void display(const pcfTime& td, double vbat, bool doPartial);
 };

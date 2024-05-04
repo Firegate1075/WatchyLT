@@ -3,6 +3,8 @@
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"
+#include "View/WatchFace.h"
+#include "View/WatchyDisplay.h"
 #include "constants.h"
 #include <Arduino.h>
 #include <Wire.h>
@@ -34,9 +36,11 @@ private:
     ~Controller() { }
 
     void handleWakeup();
+    VIEW_STATE handleScreen(VIEW_STATE currentState);
 
     PCF8563& rtc;
     GPIOHandler& gpio;
+    StateRepository& stateRepo;
 
 protected:
 public:

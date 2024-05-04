@@ -1,11 +1,13 @@
 #include "GPIOHandler.h"
 
-using namespace CONST_PIN;
+using CONST_PIN::BATT_ADC;
 
-GPIOHandler::GPIOHandler() {
+GPIOHandler::GPIOHandler()
+{
     analogReadResolution(12);
 }
 
-double GPIOHandler::getBatteryVoltage() {
+double GPIOHandler::getBatteryVoltage()
+{
     return analogReadMilliVolts(BATT_ADC) / 500.0;
 }

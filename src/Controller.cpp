@@ -3,14 +3,15 @@
 Controller::Controller()
     : rtc(PCF8563::getInstance())
     , gpio(GPIOHandler::getInstance())
+    , stateRepo(StateRepository::getInstance())
 {
     Wire.begin(SDA, SCL);
 
     debugPrint("Initial boot: ");
-    debugPrintln(StateRepository::getInstance().load().getInitialBoot());
+    debugPrintln(stateRepo.load().getInitialBoot());
 
     // handle initialBoot (wakeup after flashing)
-    if (StateRepository::getInstance().load().getInitialBoot()) {
+    if (stateRepo.load().getInitialBoot()) {
         // initialize sensors
 
         // BMA needs small delay to be setup correctly
@@ -32,17 +33,22 @@ Controller::Controller()
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BMA_INT2);
 
     handleWakeup();
-    // viewObj.updateDisplay();
+
+    VIEW_STATE previousView = stateRepo.load().getViewState();
+    VIEW_STATE nextView = handleScreen(previousView);
+    while (nextView != previousView) { // update screen while view changed
+        previousView = nextView;
+        nextView = handleScreen(previousView); // TODO: screen.hibernate() is now called before displaying is finished
+    }
 
     // wake up on RTC interrupt (active low)
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
     // wake up on any button press or BMA456 interrupt(active high)
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
 
-    StateModel stateModel = StateRepository::getInstance().load();
+    StateModel stateModel = stateRepo.load();
     stateModel.setInitialBoot(false);
-    StateRepository::getInstance().save(stateModel.setInitialBoot(false));
-    // viewObj.endScreen();
+    stateRepo.save(stateModel);
 
     // configure sensors (or maybe only before use ?)
     esp_deep_sleep_start();
@@ -81,6 +87,44 @@ void Controller::handleWakeup()
         // error: unexpected wakeup
         break;
     }
+}
+
+/// @brief handle screen displaying and user inputs
+/// @param currentState `VIEW_STATE` tracks current view
+/// @return `VIEW_STATE` next view
+VIEW_STATE Controller::handleScreen(VIEW_STATE currentState)
+{
+    // initialize display (ugly here, maybe static method in WatchyDisplay? maybe have class inherit from GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>?)
+
+    GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen = WatchyDisplay::getDisplay();
+    screen.init(0, stateRepo.load().getInitialBoot(), 10, true);
+    screen.setFullWindow();
+
+    if (stateRepo.load().getInitialBoot()) {
+        screen.fillScreen(GxEPD_BLACK);
+        screen.setTextColor(GxEPD_WHITE);
+    }
+
+    VIEW_STATE nextState = currentState;
+
+    switch (currentState) {
+    case VIEW_STATE::WATCHFACE: {
+        WatchFace watchFace;
+        pcfTime time;
+        rtc.getTimeDate(time);
+        double vbat = gpio.getBatteryVoltage();
+
+        watchFace.display(time, vbat, !stateRepo.load().getInitialBoot());
+        nextState = VIEW_STATE::WATCHFACE;
+        // buttons
+    } break;
+
+    default:
+        break;
+    }
+
+    // screen.hibernate() here?
+    return nextState;
 }
 
 Controller& Controller::getInstance()

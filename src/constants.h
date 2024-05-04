@@ -73,3 +73,13 @@ constexpr uint8_t BMA456_DEVICE_ADDR = 0x18;
 enum class VIEW_STATE {
     WATCHFACE
 };
+
+typedef struct {
+    uint8_t Second;
+    uint8_t Minute;
+    uint8_t Hour;
+    uint8_t Weekday;
+    uint8_t Day;
+    uint8_t Month;
+    uint8_t Year;
+} pcfTime;

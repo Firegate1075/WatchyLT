@@ -3,16 +3,6 @@
 #include <Rtc_Pcf8563.h>
 #include <constants.h>
 
-typedef struct {
-    uint8_t Second;
-    uint8_t Minute;
-    uint8_t Hour;
-    uint8_t Weekday;
-    uint8_t Day;
-    uint8_t Month;
-    uint8_t Year;
-} pcfTime;
-
 class PCF8563 {
 private:
     // private constructor and destructor

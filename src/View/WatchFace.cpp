@@ -9,10 +9,9 @@ WatchFace::WatchFace()
     Serial.flush();
 }
 
-void WatchFace::display()
+// TODO: replace String with static memory (etl string)
+void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
 {
-    // rtc.getTimeDate(td);
-
     int16_t x1, y1, curX, curY;
     uint16_t w, h;
 
@@ -26,12 +25,15 @@ void WatchFace::display()
     curY = screen.getCursorY();
 
     screen.setFont(&Metropolis_Black16pt7b);
-    // String timeStr = String(td.Hour) + ":" + String(td.Minute) + ":" + String(td.Second);
-    // screen.getTextBounds(timeStr, curX, curY, &x1, &y1, &w, &h);
+    String timeStr = String(td.Hour) + ":" + String(td.Minute) + ":" + String(td.Second);
+    screen.getTextBounds(timeStr, curX, curY, &x1, &y1, &w, &h);
     screen.setCursor((CONST_DISPLAY::WIDTH - w) / 2, curY);
-    // screen.println(timeStr.c_str());
+    screen.println(timeStr.c_str());
 
     screen.setFont(&Metropolis_Black11pt7b);
-    // screen.print(gpio.getBatteryVoltage());
+    screen.print(vbat);
     screen.println("V");
+
+    screen.display(doPartial);
+    screen.hibernate();
 }
