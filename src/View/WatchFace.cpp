@@ -25,10 +25,13 @@ void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
     curY = screen.getCursorY();
 
     screen.setFont(&Metropolis_Black16pt7b);
-    String timeStr = String(td.Hour) + ":" + String(td.Minute) + ":" + String(td.Second);
+
+    char timeStr[5];
+    makeTimeString(timeStr, td.Hour, td.Minute);
+
     screen.getTextBounds(timeStr, curX, curY, &x1, &y1, &w, &h);
     screen.setCursor((CONST_DISPLAY::WIDTH - w) / 2, curY);
-    screen.println(timeStr.c_str());
+    screen.println(timeStr);
 
     screen.setFont(&Metropolis_Black11pt7b);
     screen.print(vbat);
@@ -36,4 +39,13 @@ void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
 
     screen.display(doPartial);
     screen.hibernate();
+}
+
+void WatchFace::makeTimeString(char* const str, uint8_t h, uint8_t m)
+{
+    str[0] = '0' + h / 10;
+    str[1] = '0' + h % 10;
+    str[2] = ':';
+    str[3] = '0' + m / 10;
+    str[4] = '0' + m % 10;
 }

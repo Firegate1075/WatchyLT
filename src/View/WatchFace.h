@@ -8,6 +8,7 @@
 class WatchFace {
 private:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen;
+    static void makeTimeString(char* const str, uint8_t h, uint8_t m);
 
 public:
     WatchFace();
