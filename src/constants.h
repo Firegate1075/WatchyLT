@@ -43,7 +43,7 @@ namespace CONST_DISPLAY {
 constexpr uint16_t WIDTH = 200;
 constexpr uint16_t WIDTH_VISIBLE = WIDTH;
 constexpr uint16_t HEIGHT = 200;
-constexpr GxEPD2::Panel panel = GxEPD2::GDEH0154D67;
+constexpr GxEPD2::Panel panel = GxEPD2::Panel::GDEH0154D67;
 constexpr bool hasColor = false;
 constexpr bool hasPartialUpdate = true;
 constexpr bool hasFastPartialUpdate = true;

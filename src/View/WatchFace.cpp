@@ -1,7 +1,5 @@
 #include "WatchFace.h"
 
-RTC_DATA_ATTR u_int64_t counter = 0;
-
 WatchFace::WatchFace()
     : screen(WatchyDisplay::getDisplay())
 {
@@ -16,10 +14,6 @@ void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
     uint16_t w, h;
 
     screen.setFont(&Metropolis_Black11pt7b);
-
-    screen.getTextBounds(String(counter), 0, 0, &x1, &y1, &w, &h);
-    screen.setCursor(x1 + 4, -y1 + 4);
-    screen.println(String(counter).c_str());
 
     curX = screen.getCursorX();
     curY = screen.getCursorY();
