@@ -8,6 +8,7 @@ private:
     // private constructor and destructor
     GPIOHandler();
     ~GPIOHandler() { }
+    uint8_t m_mask;
 
 protected:
 public:
@@ -24,4 +25,6 @@ public:
     void operator=(const GPIOHandler&) = delete;
 
     double getBatteryVoltage();
+    uint8_t getButtonMask();
+    uint8_t readButtons();
 };

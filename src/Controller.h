@@ -3,6 +3,7 @@
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"
+#include "View/StepView.h"
 #include "View/WatchFace.h"
 #include "View/WatchyDisplay.h"
 #include "constants.h"
@@ -35,17 +36,21 @@ private:
     Controller();
     ~Controller() { }
 
-    void handleWakeup();
-    VIEW_STATE handleScreen(VIEW_STATE currentState);
-
     PCF8563& rtc;
     GPIOHandler& gpio;
     StateRepository& stateRepo;
+
+    bool m_viewChanged;
 
 protected:
 public:
     // Get singleton instance of Controller class
     static Controller& getInstance();
+
+    void handleWakeup();
+    void handleButtons();
+    void updateScreen();
+    void sleep();
 
     // remove copy constructor and assignment operator
     Controller(const Controller&) = delete;

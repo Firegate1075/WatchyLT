@@ -291,14 +291,14 @@ bool BMA456::resetStepCounter()
 /// @brief get step counter value
 /// @return step count
 /// @retval step counter value if successfull
-/// @retval returns 0 on error
+/// @retval returns -1 on error
 uint32_t BMA456::getStepCounter()
 {
     uint32_t stepCount;
     if (bma456w_step_counter_output(&stepCount, &bma) == BMA4_OK) {
         return stepCount;
     }
-    return 0;
+    return -1;
 }
 
 /**

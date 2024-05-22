@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Metropolis_Font.h"
-#include "WatchyDisplay.h"
+#include "View.h"
 #include "constants.h"
 #include <etl/string.h>
 
-class WatchFace {
+class WatchFace : public View {
 private:
-    GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen;
     static void makeTimeString(char* const str, uint8_t h, uint8_t m);
 
 public:
