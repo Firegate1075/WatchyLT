@@ -34,13 +34,28 @@ uint8_t GPIOHandler::getButtonMask()
 
 uint8_t GPIOHandler::readButtons()
 {
+    static bool previousButton1 = 0;
+    static bool previousButton2 = 0;
+    static bool previousButton3 = 0;
+    static bool previousButton4 = 0;
+
+    bool button1 = digitalRead(BUTTON1);
+    bool button2 = digitalRead(BUTTON2);
+    bool button3 = digitalRead(BUTTON3);
+    bool button4 = digitalRead(BUTTON4);
+
     uint8_t newMask;
     newMask = 0;
     // get transition
-    newMask |= (!(m_mask & 1) && digitalRead(BUTTON1)) << 0;
-    newMask |= (!(m_mask & 2) && digitalRead(BUTTON2)) << 1;
-    newMask |= (!(m_mask & 4) && digitalRead(BUTTON3)) << 2;
-    newMask |= (!(m_mask & 8) && digitalRead(BUTTON4)) << 3;
+    newMask |= (!previousButton1 && button1) << 0;
+    newMask |= (!previousButton2 && button2) << 1;
+    newMask |= (!previousButton3 && button3) << 2;
+    newMask |= (!previousButton4 && button4) << 3;
+
+    previousButton1 = button1;
+    previousButton2 = button2;
+    previousButton3 = button3;
+    previousButton4 = button4;
 
     m_mask = newMask;
 

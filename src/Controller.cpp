@@ -30,6 +30,7 @@ Controller::Controller()
         // set initalBoot false
         StateModel stateModel = stateRepo.load();
         stateModel.setInitialBoot(false);
+        stateModel.setViewState(VIEW_STATE::CONFIG_PORTAL);
         stateRepo.save(stateModel);
     }
 }
@@ -79,7 +80,6 @@ void Controller::handleButtons()
     using CONST_BUTTON::DOWN;
     using CONST_BUTTON::MENU;
     using CONST_BUTTON::UP;
-
     switch (currentState) {
     case VIEW_STATE::WATCHFACE: {
         if (buttons & UP) {
@@ -101,8 +101,44 @@ void Controller::handleButtons()
         }
 
     } break;
+    case VIEW_STATE::CONFIG_PORTAL: {
+        if (buttons & BACK) {
+            nextState = VIEW_STATE::WATCHFACE;
+
+            debugPrintln("closing WIFI");
+            WifiHandler& wifi = WifiHandler::getInstance();
+            CredentialRepository& credentialRepo = CredentialRepository::getInstance();
+
+            CredentialModel newModel = wifi.getCredentialsOfCurrentNetwork();
+            const etl::vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& vec = credentialRepo.loadAll();
+            bool alreadySaved = false;
+            for (CredentialModel model : vec) {
+                if (model.getSSID() == newModel.getSSID()) {
+                    alreadySaved = true;
+                    debugPrint("Wifi with SSID=");
+                    debugPrint(newModel.getSSID().c_str());
+                    debugPrintln(" was already saved");
+                    break;
+                }
+            }
+
+            if (!alreadySaved) {
+                credentialRepo.save(newModel);
+                debugPrint("Wifi with SSID=");
+                debugPrint(newModel.getSSID().c_str());
+                debugPrintln(" saved");
+            }
+
+            wifi.closeConfigurationPortal();
+
+            m_busy = false; // we may sleep now
+        }
+    } break;
 
     default:
+        if (buttons) {
+            nextState = VIEW_STATE::WATCHFACE;
+        }
         break;
     }
 
@@ -113,8 +149,30 @@ void Controller::handleButtons()
         StateModel stateModel = stateRepo.load();
         stateModel.setViewState(nextState);
         stateRepo.save(stateModel);
-    } else {
-        m_viewChanged = false;
+    }
+}
+
+void Controller::handleRadio()
+{
+    VIEW_STATE currentState = stateRepo.load().getViewState();
+
+    switch (currentState) {
+    case VIEW_STATE::WATCHFACE: {
+
+    } break;
+    case VIEW_STATE::STEP: {
+
+    } break;
+    case VIEW_STATE::CONFIG_PORTAL: {
+        WifiHandler& wifi = WifiHandler::getInstance();
+
+        wifi.openConfigurationPortal();
+        wifi.loop();
+    } break;
+
+    default:
+
+        break;
     }
 }
 
@@ -150,10 +208,17 @@ void Controller::updateScreen()
 
         stepView.display(steps, partial);
     } break;
+    case VIEW_STATE::CONFIG_PORTAL: {
+        ConfigPortalView view;
+        view.display(partial);
+        m_busy = true; // prevent Watchy from sleeping while config portal is open
+    } break;
 
     default:
         break;
     }
+
+    m_viewChanged = false;
 
     screen.hibernate();
 }
@@ -176,6 +241,11 @@ void Controller::sleep()
 
     // ... and sleep
     esp_deep_sleep_start();
+}
+
+bool Controller::isBusy()
+{
+    return m_busy;
 }
 
 Controller& Controller::getInstance()

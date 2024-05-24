@@ -37,6 +37,7 @@ constexpr uint8_t BACK = 1 << 0;
 constexpr uint8_t MENU = 1 << 1;
 constexpr uint8_t UP = 1 << 2;
 constexpr uint8_t DOWN = 1 << 3;
+constexpr uint32_t HOLD_TIME_MS = 1000;
 }
 
 namespace CONST_WIFI {
@@ -79,7 +80,8 @@ constexpr uint8_t BMA456_DEVICE_ADDR = 0x18;
 
 enum class VIEW_STATE {
     WATCHFACE,
-    STEP
+    STEP,
+    CONFIG_PORTAL
 };
 
 typedef struct {

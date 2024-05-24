@@ -1,21 +1,23 @@
 #include "WifiHandler.h"
-
+#include "Arduino.h"
 WifiHandler::WifiHandler()
     : wifiManager()
 {
+    initialize();
 }
 
 void WifiHandler::initialize()
 {
     WiFi.mode(WIFI_STA);
     wifiManager.setConfigPortalBlocking(false);
-    wifiManager.setConfigPortalTimeout(CONST_WIFI::portalTimeout); // setTimeout does the same thing.
+    // wifiManager.setConfigPortalTimeout(CONST_WIFI::portalTimeout); // setTimeout does the same thing.
     wifiManager.setWiFiAutoReconnect(false);
-    wifiManager.setConnectTimeout(CONST_WIFI::connectTimeout);
+    // wifiManager.setConnectTimeout(CONST_WIFI::connectTimeout);
 
     wifiManager.setAPCallback(onAPStart);
     wifiManager.setSaveConfigCallback(onConfigSaveAndConnect);
     wifiManager.setConfigPortalTimeoutCallback(onConfigPortalTimeout);
+    Serial.println("initialized");
 }
 
 /**
@@ -67,7 +69,8 @@ void WifiHandler::onConfigPortalTimeout()
 void WifiHandler::observerCallback()
 {
     for_each(observers.begin(), observers.end(), [](WifiObserver* observer) {
-        observer->wifiCallback();
+        if (observer)
+            observer->wifiCallback();
     });
 }
 
@@ -78,10 +81,19 @@ void WifiHandler::observerCallback()
  * @retval true -> Connection successfull
  * @retval false -> Connection failed
  */
-bool WifiHandler::connectToNetwork(CredentialModel& credentials)
+bool WifiHandler::connectToNetwork(const vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& credentials)
 {
-    bool success = WiFi.begin(credentials.getSSID().c_str(), credentials.getPassword().c_str()) == WL_CONNECTED;
-    return success;
+    for (auto credential : credentials) {
+        uint16_t networkCount = WiFi.scanNetworks();
+        for (uint16_t networkIndex = 0; networkIndex < networkCount; networkIndex++) {
+            if (credential.getSSID() == WiFi.SSID(networkIndex).c_str()) {
+                return WiFi.begin(credential.getSSID().c_str(), credential.getPassword().c_str()) == WL_CONNECTED;
+            }
+        }
+    }
+
+    // no credentials available for networks
+    return false;
 }
 
 /**
@@ -115,6 +127,11 @@ bool WifiHandler::openConfigurationPortal()
 bool WifiHandler::closeConfigurationPortal()
 {
     return wifiManager.stopConfigPortal();
+}
+
+bool WifiHandler::isConfigurationPortalOpen()
+{
+    return wifiManager.getConfigPortalActive();
 }
 
 /**

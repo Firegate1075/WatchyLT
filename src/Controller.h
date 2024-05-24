@@ -1,8 +1,11 @@
 #pragma once
+#include "Repositories/CredentialRepository.h"
 #include "Repositories/StateRepository.h"
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"
+#include "Services/WifiHandler.h"
+#include "View/ConfigPortalView.h"
 #include "View/StepView.h"
 #include "View/WatchFace.h"
 #include "View/WatchyDisplay.h"
@@ -41,6 +44,7 @@ private:
     StateRepository& stateRepo;
 
     bool m_viewChanged;
+    bool m_busy = false;
 
 protected:
 public:
@@ -49,8 +53,10 @@ public:
 
     void handleWakeup();
     void handleButtons();
+    void handleRadio();
     void updateScreen();
     void sleep();
+    bool isBusy();
 
     // remove copy constructor and assignment operator
     Controller(const Controller&) = delete;

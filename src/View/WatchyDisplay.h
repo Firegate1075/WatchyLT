@@ -36,8 +36,6 @@ public:
 
     static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& getDisplay()
     {
-        Serial.println("GetDisplay");
-        Serial.flush();
         static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> display = WatchyDisplay();
         return display;
     }

@@ -4,10 +4,12 @@
 #include "WifiObserver.h"
 #include "constants.h"
 #include "etl/list.h"
+#include "etl/vector.h"
 #include <WifiManager.h>
 
 using etl::for_each;
 using etl::list;
+using etl::vector;
 
 class WifiHandler {
 private:
@@ -38,10 +40,14 @@ public:
 
     void initialize();
     CredentialModel getCredentialsOfCurrentNetwork();
-    bool connectToNetwork(CredentialModel& credentials);
+    bool connectToNetwork(const vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& credentials);
     bool disconnect();
+
     bool openConfigurationPortal();
     bool closeConfigurationPortal();
+
+    bool isConfigurationPortalOpen();
+
     void loop();
     bool attach(WifiObserver* observer);
     void detach(WifiObserver* observer);

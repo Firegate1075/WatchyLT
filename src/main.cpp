@@ -8,8 +8,16 @@ void setup()
     Controller& controller = Controller::getInstance();
 
     controller.handleWakeup();
+
     controller.handleButtons();
+    controller.handleRadio();
     controller.updateScreen();
+    while (controller.isBusy()) {
+        controller.handleButtons();
+        controller.handleRadio();
+    }
+    controller.updateScreen();
+
     controller.sleep();
 }
 

@@ -37,6 +37,8 @@ bool BMA456::init()
 
     softReset();
 
+    delay(100);
+
     if (bma456w_write_config_file(&bma) != BMA4_OK) {
         DEBUG("BMA456 WRITE CONFIG FAIL\n");
         return false;
