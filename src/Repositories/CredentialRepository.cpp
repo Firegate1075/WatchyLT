@@ -22,12 +22,14 @@ void CredentialRepository::loadModelVector()
 
     modelVector.clear();
     for (uint8_t index = 0; index < modelVector.max_size(); index++) {
-        if (ssidRaw[index] == nullptr) {
-            break; // got all saved credentials
-        }
+        string<SSID_LEN> ssid = ssidRaw[index];
+        if (ssid.size() == 0)
+            break;
 
-        nextCredentials.setSSID(string<SSID_LEN>(ssidRaw[index]));
-        nextCredentials.setPassword(string<PASS_LEN>(passwordRaw[index]));
+        string<PASS_LEN> pass = passwordRaw[index];
+
+        nextCredentials.setSSID(ssid);
+        nextCredentials.setPassword(pass);
         modelVector.push_back(nextCredentials);
     }
 }

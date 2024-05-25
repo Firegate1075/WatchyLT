@@ -47,6 +47,13 @@ constexpr uint8_t connectTimeout = 30;
 constexpr const char* configurationPortalName = "Watchy-AP";
 }
 
+namespace CONST_NETWORK {
+constexpr uint8_t IP_LENGTH = 16;
+constexpr uint8_t URL_LENGTH = 100;
+constexpr const char timeApiURL[] = "https://timeapi.io/api/Time/current/ip";
+constexpr const char ipApiURL[] = "https://api.ipify.org/?format=text";
+}
+
 namespace CONST_DISPLAY {
 constexpr uint16_t WIDTH = 200;
 constexpr uint16_t WIDTH_VISIBLE = WIDTH;

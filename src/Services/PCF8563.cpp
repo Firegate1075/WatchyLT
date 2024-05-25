@@ -24,7 +24,7 @@ void PCF8563::setTimeDate(pcfTime tm)
     // breakTime(t, tm);
 
     rtc.setDate(tm.Day, tm.Weekday, tm.Month, CONST_RTC::CENTURY, tm.Year);
-    rtc.setTime(tm.Second, tm.Minute, tm.Hour);
+    rtc.setTime(tm.Hour, tm.Minute, tm.Second);
     resetAlarm();
 }
 

@@ -3,6 +3,7 @@
 #include "Repositories/StateRepository.h"
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
+#include "Services/NTPHandler.h"
 #include "Services/PCF8563.h"
 #include "Services/WifiHandler.h"
 #include "View/ConfigPortalView.h"

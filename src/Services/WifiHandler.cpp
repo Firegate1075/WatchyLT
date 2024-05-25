@@ -13,11 +13,11 @@ void WifiHandler::initialize()
     // wifiManager.setConfigPortalTimeout(CONST_WIFI::portalTimeout); // setTimeout does the same thing.
     wifiManager.setWiFiAutoReconnect(false);
     // wifiManager.setConnectTimeout(CONST_WIFI::connectTimeout);
+    wifiManager.setEnableConfigPortal(false);
 
     wifiManager.setAPCallback(onAPStart);
     wifiManager.setSaveConfigCallback(onConfigSaveAndConnect);
     wifiManager.setConfigPortalTimeoutCallback(onConfigPortalTimeout);
-    Serial.println("initialized");
 }
 
 /**
@@ -83,15 +83,19 @@ void WifiHandler::observerCallback()
  */
 bool WifiHandler::connectToNetwork(const vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& credentials)
 {
-    for (auto credential : credentials) {
-        uint16_t networkCount = WiFi.scanNetworks();
-        for (uint16_t networkIndex = 0; networkIndex < networkCount; networkIndex++) {
+
+    int16_t networkCount;
+    do {
+        networkCount = WiFi.scanNetworks();
+    } while (networkCount == WIFI_SCAN_FAILED || networkCount == WIFI_SCAN_RUNNING);
+
+    for (int16_t networkIndex = 0; networkIndex < networkCount; networkIndex++) {
+        for (auto credential : credentials) {
             if (credential.getSSID() == WiFi.SSID(networkIndex).c_str()) {
-                return WiFi.begin(credential.getSSID().c_str(), credential.getPassword().c_str()) == WL_CONNECTED;
+                return wifiManager.autoConnect(credential.getSSID().c_str(), credential.getPassword().c_str());
             }
         }
     }
-
     // no credentials available for networks
     return false;
 }

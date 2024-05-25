@@ -131,6 +131,15 @@ void Controller::handleButtons()
 
             wifi.closeConfigurationPortal();
 
+            debugPrintln("connecting");
+            if (wifi.connectToNetwork(credentialRepo.loadAll())) {
+                debugPrintln("connected");
+                // sync time while connected
+                NTPHandler ntp;
+                pcfTime currentTime = ntp.getTime();
+                rtc.setTimeDate(currentTime);
+            }
+
             m_busy = false; // we may sleep now
         }
     } break;
