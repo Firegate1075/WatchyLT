@@ -7,38 +7,46 @@
 //
 // Author: Jean-Marc Zingg
 //
+// Version: see library.properties
+//
 // Library: https://github.com/ZinggJM/GxEPD2
 //
 // The original code from the author has been slightly modified to improve the performance for Watchy Project:
 // Link: https://github.com/sqfmi/Watchy
-//
-// And we modified it, to better fit our own Watchy Project
 
 #pragma once
 
 #include <GxEPD2_BW.h>
-#include <constants.h>
+#include <GxEPD2_EPD.h>
 
 class WatchyDisplay : public GxEPD2_EPD {
 public:
     // attributes
-    static const uint16_t WIDTH = CONST_DISPLAY::WIDTH;
-    static const uint16_t WIDTH_VISIBLE = CONST_DISPLAY::WIDTH_VISIBLE;
-    static const uint16_t HEIGHT = CONST_DISPLAY::HEIGHT;
-    static const GxEPD2::Panel panel = CONST_DISPLAY::panel;
-    static const bool hasColor = CONST_DISPLAY::hasColor;
-    static const bool hasPartialUpdate = CONST_DISPLAY::hasPartialUpdate;
-    static const bool hasFastPartialUpdate = CONST_DISPLAY::hasFastPartialUpdate;
-    static const uint16_t power_on_time = CONST_DISPLAY::power_on_time; // ms, e.g. 95583us
-    static const uint16_t power_off_time = CONST_DISPLAY::power_off_time; // ms, e.g. 140621us
-    static const uint16_t full_refresh_time = CONST_DISPLAY::full_refresh_time; // ms, e.g. 2509602us
-    static const uint16_t partial_refresh_time = CONST_DISPLAY::partial_refresh_time; // ms, e.g. 457282us
+    static const uint16_t WIDTH = 200;
+    static const uint16_t WIDTH_VISIBLE = WIDTH;
+    static const uint16_t HEIGHT = 200;
+    static const GxEPD2::Panel panel = GxEPD2::GDEH0154D67;
+    static const bool hasColor = false;
+    static const bool hasPartialUpdate = true;
+    static const bool hasFastPartialUpdate = true;
+    static const uint16_t power_on_time = 100; // ms, e.g. 95583us
+    static const uint16_t power_off_time = 150; // ms, e.g. 140621us
+    static const uint16_t full_refresh_time = 2600; // ms, e.g. 2509602us
+    static const uint16_t partial_refresh_time = 500; // ms, e.g. 457282us
+    // constructor
 
     static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& getDisplay()
     {
         static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> display = WatchyDisplay();
         return display;
     }
+
+    void initWatchy(bool initialBoot);
+    void setDarkBorder(bool darkBorder);
+    void asyncPowerOn();
+    void _PowerOnAsync();
+    bool waitingPowerOn = false;
+    static void busyCallback(const void*);
     // methods (virtual)
     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen
     void clearScreen(uint8_t value = 0xFF); // init controller memory and screen (default white)
@@ -73,11 +81,11 @@ public:
     void hibernate(); // turns powerOff() and sets controller to deep sleep for minimum power use, ONLY if wakeable by RST (rst >= 0)
 
     bool darkBorder = false; // adds a dark border outside the normal screen area
+
+    static constexpr bool reduceBoosterTime = true; // Saves ~200ms
 private:
-    // make constructor private
     WatchyDisplay();
 
-    static void busyCallback(const void*);
     void _writeScreenBuffer(uint8_t command, uint8_t value);
     void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void _writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
@@ -90,6 +98,8 @@ private:
     void _Init_Part();
     void _Update_Full();
     void _Update_Part();
+
+    void _reset();
 
     void _transferCommand(uint8_t command);
 };

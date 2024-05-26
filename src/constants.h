@@ -79,10 +79,15 @@ constexpr uint8_t DATA_MODE = SPI_MODE0;
 
 namespace CONST_RTC {
 constexpr uint8_t CENTURY = 0; // 0 = 2000; 1 = 1900;
+constexpr uint8_t REDUCED_WAKEUP_MINUTES = 5; // wakes up every 5 minutes when not moved
 }
 
 namespace CONST_BMA {
 constexpr uint8_t BMA456_DEVICE_ADDR = 0x18;
+constexpr uint16_t ANYMOT_DURATION = 5; // x20ms = 100ms, max 163s
+constexpr uint16_t ANYMOT_THRESHOLD = 0xaa; // default
+constexpr uint16_t NOMOT_DURATION = 2 * 60 * 20; // x20ms = 10s, max 163s (13bit?)
+constexpr uint16_t NOMOT_THRESHOLD = 10; // .48mG, might be too small
 }
 
 enum class VIEW_STATE {

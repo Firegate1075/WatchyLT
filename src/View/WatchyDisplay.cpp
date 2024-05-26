@@ -7,20 +7,55 @@
 //
 // Author: Jean-Marc Zingg
 //
+// Version: see library.properties
+//
 // Library: https://github.com/ZinggJM/GxEPD2
 //
 // The original code from the author has been slightly modified to improve the performance for Watchy Project:
 // Link: https://github.com/sqfmi/Watchy
-//
-// And we modified it, to better fit our own Watchy Project
 
 #include "WatchyDisplay.h"
+#include "config.h"
+#include "constants.h"
+
+void WatchyDisplay::busyCallback(const void*)
+{
+    gpio_wakeup_enable((gpio_num_t)CONST_PIN::BUSY, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+    esp_light_sleep_start();
+}
 
 WatchyDisplay::WatchyDisplay()
     : GxEPD2_EPD(CONST_PIN::CS, CONST_PIN::DC, CONST_PIN::RES, CONST_PIN::BUSY, CONST_DISPLAY::BUSY_LEVEL, CONST_DISPLAY::BUSY_TIMEOUT, CONST_DISPLAY::WIDTH, CONST_DISPLAY::HEIGHT, CONST_DISPLAY::panel, CONST_DISPLAY::hasColor, CONST_DISPLAY::hasPartialUpdate, CONST_DISPLAY::hasFastPartialUpdate)
 {
     selectSPI(SPI, SPISettings(CONST_SPI::CLOCK, CONST_SPI::BIT_ORDER, CONST_SPI::DATA_MODE)); // Set SPI to 20Mhz (default is 4Mhz)
     setBusyCallback(busyCallback);
+}
+
+void WatchyDisplay::initWatchy(bool initialBoot)
+{
+    // Watchy default initialization
+    init(0, initialBoot, 2, true);
+}
+
+void WatchyDisplay::asyncPowerOn()
+{
+    // This is expensive if unused
+    if (!waitingPowerOn && !_hibernating) {
+        _InitDisplay();
+        _PowerOnAsync();
+    }
+}
+
+void WatchyDisplay::setDarkBorder(bool dark)
+{
+    if (_hibernating)
+        return;
+    darkBorder = dark;
+    _startTransfer();
+    _transferCommand(0x3C); // BorderWavefrom
+    _transfer(dark ? 0x02 : 0x05);
+    _endTransfer();
 }
 
 void WatchyDisplay::clearScreen(uint8_t value)
@@ -305,13 +340,6 @@ void WatchyDisplay::hibernate()
     }
 }
 
-void WatchyDisplay::busyCallback(const void*)
-{
-    gpio_wakeup_enable((gpio_num_t)CONST_PIN::BUSY, GPIO_INTR_LOW_LEVEL);
-    esp_sleep_enable_gpio_wakeup();
-    esp_light_sleep_start();
-}
-
 void WatchyDisplay::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
     _startTransfer();
@@ -333,29 +361,50 @@ void WatchyDisplay::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint1
     _endTransfer();
 }
 
+void WatchyDisplay::_PowerOnAsync()
+{
+    if (_power_is_on)
+        return;
+    _startTransfer();
+    _transferCommand(0x22);
+    _transfer(0xf8);
+    _transferCommand(0x20);
+    _endTransfer();
+    waitingPowerOn = true;
+    _power_is_on = true;
+}
+
 void WatchyDisplay::_PowerOn()
 {
-    if (!_power_is_on) {
-        _startTransfer();
-        _transferCommand(0x22);
-        _transfer(0xf8);
-        _transferCommand(0x20);
-        _endTransfer();
+    if (waitingPowerOn) {
+        waitingPowerOn = false;
         _waitWhileBusy("_PowerOn", power_on_time);
     }
+    if (_power_is_on)
+        return;
+    _startTransfer();
+    _transferCommand(0x22);
+    _transfer(0xf8);
+    _transferCommand(0x20);
+    _endTransfer();
+    _waitWhileBusy("_PowerOn", power_on_time);
     _power_is_on = true;
 }
 
 void WatchyDisplay::_PowerOff()
 {
-    if (_power_is_on) {
-        _startTransfer();
-        _transferCommand(0x22);
-        _transfer(0x83);
-        _transferCommand(0x20);
-        _endTransfer();
-        _waitWhileBusy("_PowerOff", power_off_time);
+    if (waitingPowerOn) {
+        waitingPowerOn = false;
+        _waitWhileBusy("_PowerOn", power_on_time);
     }
+    if (!_power_is_on)
+        return;
+    _startTransfer();
+    _transferCommand(0x22);
+    _transfer(0x83);
+    _transferCommand(0x20);
+    _endTransfer();
+    _waitWhileBusy("_PowerOff", power_off_time);
     _power_is_on = false;
     _using_partial_mode = false;
 }
@@ -364,21 +413,52 @@ void WatchyDisplay::_InitDisplay()
 {
     if (_hibernating)
         _reset();
-    _writeCommand(0x12); // soft reset
-    _waitWhileBusy("_SoftReset", 10); // 10ms max according to specs
+
+    // No need to soft reset, the Display goes to same state after hard reset
+    // _writeCommand(0x12); // soft reset
+    // _waitWhileBusy("_SoftReset", 10); // 10ms max according to specs*/
 
     _startTransfer();
     _transferCommand(0x01); // Driver output control
     _transfer(0xC7);
     _transfer(0x00);
     _transfer(0x00);
-    _transferCommand(0x3C); // BorderWavefrom
-    _transfer(darkBorder ? 0x02 : 0x05);
+
+    if (reduceBoosterTime) {
+        // SSD1675B controller datasheet
+        _transferCommand(0x0C); // BOOSTER_SOFT_START_CONTROL
+        // Set the driving strength of GDR for all phases to maximun 0b111 -> 0xF
+        // Set the minimum off time of GDR to minimum 0x4 (values below sould be same)
+        _transfer(0xF4); // Phase1 Default value 0x8B
+        _transfer(0xF4); // Phase2 Default value 0x9C
+        _transfer(0xF4); // Phase3 Default value 0x96
+        _transfer(0x00); // Duration of phases, Default 0xF = 0b00 11 11 (40ms Phase 1/2, 10ms Phase 3)
+    }
+
     _transferCommand(0x18); // Read built-in temperature sensor
     _transfer(0x80);
     _endTransfer();
 
+    setDarkBorder(darkBorder);
+
     _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+}
+
+void WatchyDisplay::_reset()
+{
+    // Call default method if not configured the same way
+    if (_rst < 0 || !_pulldown_rst_mode) {
+        GxEPD2_EPD::_reset();
+        return;
+    }
+
+    digitalWrite(_rst, LOW);
+    pinMode(_rst, OUTPUT);
+    delay(_reset_duration);
+    pinMode(_rst, INPUT_PULLUP);
+    // Tested calling _powerOn() inmediately, and works ok, no need to sleep
+    // delay(_reset_duration > 10 ? _reset_duration : 0);
+    _hibernating = false;
 }
 
 void WatchyDisplay::_Init_Full()

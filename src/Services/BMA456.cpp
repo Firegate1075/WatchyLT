@@ -12,7 +12,14 @@ BMA456::BMA456()
     // Initialize bma456 struct
     bma.intf = BMA4_I2C_INTF;
     bma.variant = BMA45X_VARIANT;
-    bma4_interface_i2c_init(&bma);
+
+    if (bma4_interface_i2c_init(&bma) != BMA4_OK) {
+        DEBUG("BMA456 INTERFACE FAIL\n");
+    }
+
+    if (bma456w_init(&bma) != BMA4_OK) {
+        DEBUG("BMA456 INIT FAIL\n");
+    }
 }
 
 /// @brief Initializes BMA456 after reset
@@ -21,19 +28,6 @@ BMA456::BMA456()
 /// @retval false -> initialization failed
 bool BMA456::init()
 {
-
-    bma.intf = BMA4_I2C_INTF;
-    bma.variant = BMA45X_VARIANT;
-
-    if (bma4_interface_i2c_init(&bma) != BMA4_OK) {
-        DEBUG("BMA456 INTERFACE FAIL\n");
-        return false;
-    }
-
-    if (bma456w_init(&bma) != BMA4_OK) {
-        DEBUG("BMA456 INIT FAIL\n");
-        return false;
-    }
 
     softReset();
 
@@ -233,12 +227,12 @@ bool BMA456::enableAccelerometer()
 
 bool BMA456::enableStepCounter()
 {
-    return false;
+    return setFeatureEnable(BMA456W_STEP_CNTR, true);
 }
 
 bool BMA456::disableStepCounter()
 {
-    return false;
+    return setFeatureEnable(BMA456W_STEP_CNTR, false);
 }
 
 /// @brief upload accelerometer config to BMA456
@@ -351,6 +345,46 @@ bool BMA456::disableWristWearDetection()
     return setFeatureEnable(BMA456W_WRIST_WEAR_WAKEUP, false);
 }
 
+bool BMA456::enableAnyMotionDetection()
+{
+    struct bma456w_any_no_mot_config config;
+    config.axes_en = BMA456W_EN_ALL_AXIS;
+    config.duration = CONST_BMA::ANYMOT_DURATION;
+    config.threshold = CONST_BMA::ANYMOT_THRESHOLD;
+
+    return BMA4_OK == bma456w_set_any_mot_config(&config, &bma);
+}
+
+bool BMA456::disableAnyMotionDetection()
+{
+    struct bma456w_any_no_mot_config config;
+    config.axes_en = BMA456W_DIS_ALL_AXIS;
+    config.duration = CONST_BMA::ANYMOT_DURATION;
+    config.threshold = CONST_BMA::ANYMOT_THRESHOLD;
+
+    return BMA4_OK == bma456w_set_any_mot_config(&config, &bma);
+}
+
+bool BMA456::enableNoMotionDetection()
+{
+    struct bma456w_any_no_mot_config config;
+    config.axes_en = BMA456W_EN_ALL_AXIS;
+    config.duration = CONST_BMA::NOMOT_DURATION;
+    config.threshold = CONST_BMA::NOMOT_THRESHOLD;
+
+    return BMA4_OK == bma456w_set_no_mot_config(&config, &bma);
+}
+
+bool BMA456::disableNoMotionDetection()
+{
+    struct bma456w_any_no_mot_config config;
+    config.axes_en = BMA456W_DIS_ALL_AXIS;
+    config.duration = CONST_BMA::NOMOT_DURATION;
+    config.threshold = CONST_BMA::NOMOT_THRESHOLD;
+
+    return BMA4_OK == bma456w_set_no_mot_config(&config, &bma);
+}
+
 /// @brief configure BMA456's interrupt pin
 /// @param config stucture containing configuration data for interrupt pin
 /// @param interruptPin specifies interrupt pin of BMA456. Use bma4 macros.
@@ -419,7 +453,7 @@ bool BMA456::setFeatureEnable(uint8_t feature, bool enable)
 
 bool BMA456::setStepCountInterruptEnable(bool en)
 {
-    if (enableStepCounter() == false) {
+    if (en && enableStepCounter() == false) {
         return false;
     }
 
@@ -428,7 +462,7 @@ bool BMA456::setStepCountInterruptEnable(bool en)
 
 bool BMA456::setActivityInterruptEnable(bool en)
 {
-    if (enableActivityDetection() == false) {
+    if (en && enableActivityDetection() == false) {
         return false;
     }
 
@@ -437,7 +471,7 @@ bool BMA456::setActivityInterruptEnable(bool en)
 
 bool BMA456::setWristInterruptEnable(bool en)
 {
-    if (enableWristWearDetection() == false) {
+    if (en && enableWristWearDetection() == false) {
         return false;
     }
 
@@ -446,11 +480,19 @@ bool BMA456::setWristInterruptEnable(bool en)
 
 bool BMA456::setAnyMotionInterruptEnable(bool en)
 {
+    if (en && enableAnyMotionDetection() == false) {
+        return false;
+    }
+
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_ANY_MOT_INT, en);
 }
 
 bool BMA456::setNoMotionInterruptEnable(bool en)
 {
+    if (en && enableNoMotionDetection() == false) {
+        return false;
+    }
+
     return setInterruptEnable(BMA4_INTR1_MAP, BMA456W_NO_MOT_INT, en);
 }
 
@@ -496,12 +538,11 @@ void BMA456::bma4xx_hal_delay_usec(uint32_t period_us, void* intf_ptr)
 /*! This API is used to perform I2C read operation with sensor */
 int8_t BMA456::bma4xx_hal_i2c_bus_read(uint8_t reg_addr, uint8_t* reg_data, uint32_t length, void* intf_ptr)
 {
-    BMA456& bma = getInstance();
     int8_t rslt = 0;
     // uint8_t dev_id = 0x68;
     uint8_t* dev_id = (uint8_t*)intf_ptr;
 
-    rslt = bma.BMA456_read_i2c(*dev_id, reg_addr, reg_data, length);
+    rslt = BMA456::BMA456_read_i2c(*dev_id, reg_addr, reg_data, length);
 
     return rslt;
 }
@@ -509,12 +550,11 @@ int8_t BMA456::bma4xx_hal_i2c_bus_read(uint8_t reg_addr, uint8_t* reg_data, uint
 /*! This API is used to perform I2C write operations with sensor */
 int8_t BMA456::bmi4xx_hal_i2c_bus_write(uint8_t reg_addr, const uint8_t* reg_data, uint32_t length, void* intf_ptr)
 {
-    BMA456& bma = getInstance();
     int8_t rslt = 0;
     //    uint8_t dev_id = 0x68;
 
     uint8_t* dev_id = (uint8_t*)intf_ptr;
-    rslt = bma.BMA456_write_i2c(*dev_id, reg_addr, (uint8_t*)reg_data, length);
+    rslt = BMA456::BMA456_write_i2c(*dev_id, reg_addr, (uint8_t*)reg_data, length);
 
     return rslt;
 }

@@ -5,6 +5,11 @@ bool StateModel::getInitialBoot() const
     return initialBoot;
 }
 
+bool StateModel::isInMotion() const
+{
+    return inMotion;
+}
+
 VIEW_STATE StateModel::getViewState() const
 {
     return viewState;
@@ -13,6 +18,12 @@ VIEW_STATE StateModel::getViewState() const
 StateModel& StateModel::setInitialBoot(bool initialBoot)
 {
     this->initialBoot = initialBoot;
+    return *this;
+}
+
+StateModel& StateModel::setInMotion(bool inMotion)
+{
+    this->inMotion = inMotion;
     return *this;
 }
 

@@ -63,6 +63,27 @@ void PCF8563::resetAlarm()
     rtc.setAlarm(nextAlarmMin, 99, 99, 99);
 }
 
+/**
+ * @brief Clear alarm. PCF8563 interrupt will no longer fire until next alarm.
+ */
+void PCF8563::clearAlarm()
+{
+    rtc.clearAlarm();
+}
+
+/**
+ * @brief sets the Alarm. An Alarm will be triggered in minutesToWakeup minutes. Default=1
+ */
+void PCF8563::setAlarm(uint8_t minutesToWakeup)
+{
+    rtc.getTime();
+
+    uint8_t nextAlarmMin = rtc.getMinute() + minutesToWakeup;
+    nextAlarmMin %= 60; // wrap around hours
+
+    rtc.setAlarm(nextAlarmMin, 99, 99, 99);
+}
+
 char* PCF8563::formatTime()
 {
     return rtc.formatTime();

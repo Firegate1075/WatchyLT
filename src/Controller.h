@@ -44,7 +44,8 @@ private:
     GPIOHandler& gpio;
     StateRepository& stateRepo;
 
-    bool m_viewChanged;
+    // tracks if new view will be displayed
+    bool m_viewChanged = false;
     bool m_busy = false;
 
 protected:

@@ -24,13 +24,14 @@ Controller::Controller()
         bma456.setStepCounterWatermark(1);
         bma456.setStepCountInterruptEnable();
 
+        bma456.setWristInterruptEnable();
+        bma456.setNoMotionInterruptEnable();
+
         rtc.resetRTC();
         rtc.resetAlarm();
-
-        // set initalBoot false
         StateModel stateModel = stateRepo.load();
-        stateModel.setInitialBoot(false);
         stateModel.setViewState(VIEW_STATE::CONFIG_PORTAL);
+        stateModel.setInMotion(true);
         stateRepo.save(stateModel);
     }
 }
@@ -43,20 +44,57 @@ void Controller::handleWakeup()
 {
     // retrieve cause of wakeup
     esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
-    BMA456_interrupt bma_interrupt = BMA456::getInstance().getInterrupt();
+    BMA456& bma456 = BMA456::getInstance();
+    BMA456_interrupt bma_interrupt = bma456.getInterrupt();
 
     switch (cause) {
     case ESP_SLEEP_WAKEUP_EXT0:
         debugPrintln("RTC Wakeup");
-        rtc.resetAlarm();
+        rtc.clearAlarm();
+        if (stateRepo.load().isInMotion())
+            rtc.setAlarm(1);
+        else
+            rtc.setAlarm(CONST_RTC::REDUCED_WAKEUP_MINUTES);
 
         // RTC wakeup
         break;
     case ESP_SLEEP_WAKEUP_EXT1:
+        StateModel model;
         if (bma_interrupt != BMA456_interrupt::NONE) {
             debugPrintln("BMA wakeup");
+            debugPrint("interrupt=");
+            debugPrintln((uint8_t)bma_interrupt);
+
+            switch (bma_interrupt) {
+            case BMA456_interrupt::ANY_MOT:
+                stateRepo.save(model.setInMotion(true));
+
+                bma456.setNoMotionInterruptEnable(true);
+                bma456.setAnyMotionInterruptEnable(false);
+                bma456.disableAnyMotionDetection();
+                bma456.enableStepCounter();
+
+                // activate minutely alarms
+                rtc.clearAlarm();
+                rtc.setAlarm(1);
+
+                break;
+            case BMA456_interrupt::NO_MOT:
+                debugPrintln("no mot int");
+                stateRepo.save(model.setInMotion(false));
+                bma456.setAnyMotionInterruptEnable(true);
+                bma456.setNoMotionInterruptEnable(false);
+                bma456.disableNoMotionDetection();
+                bma456.disableStepCounter();
+
+                // activate reduced alarms
+                rtc.clearAlarm();
+                rtc.setAlarm(CONST_RTC::REDUCED_WAKEUP_MINUTES);
+                break;
+            }
         } else {
             debugPrintln("Button wakeup");
+            stateRepo.save(model.setInMotion(true));
         }
         // button interrupt or bma interrupt
         break;
@@ -122,7 +160,7 @@ void Controller::handleButtons()
                 }
             }
 
-            if (!alreadySaved) {
+            if (!alreadySaved && newModel.getSSID().size() > 0) {
                 credentialRepo.save(newModel);
                 debugPrint("Wifi with SSID=");
                 debugPrint(newModel.getSSID().c_str());
@@ -188,7 +226,6 @@ void Controller::handleRadio()
 void Controller::updateScreen()
 {
     // initialize display (ugly here, maybe static method in WatchyDisplay? maybe have class inherit from GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>?)
-
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen = WatchyDisplay::getDisplay();
     screen.init(0, stateRepo.load().getInitialBoot(), 10, true);
     screen.setFullWindow();
@@ -234,6 +271,10 @@ void Controller::updateScreen()
 
 void Controller::sleep()
 {
+    // set initialBoot false
+    StateModel model = stateRepo.load();
+    stateRepo.save(model.setInitialBoot(false));
+
     // configure next wake up
     uint64_t wakeupPinMask = 0;
     wakeupPinMask |= ((uint64_t)1 << CONST_PIN::BUTTON1);

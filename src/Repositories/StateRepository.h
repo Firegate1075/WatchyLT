@@ -19,6 +19,6 @@ public:
     void operator=(const StateRepository&) = delete;
     static StateRepository& getInstance();
 
-    const StateModel& load();
-    void save(StateModel& stateModel);
+    const StateModel& load() const;
+    void save(const StateModel& stateModel);
 };

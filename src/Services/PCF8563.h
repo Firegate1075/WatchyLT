@@ -29,5 +29,7 @@ public:
     void setTimeDate(pcfTime tm);
     void getTimeDate(pcfTime& tm);
     void resetAlarm();
+    void clearAlarm();
+    void setAlarm(uint8_t minutesToWakeup = 1);
     char* formatTime();
 };
