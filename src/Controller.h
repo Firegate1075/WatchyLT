@@ -10,12 +10,13 @@
 #include "View/StepView.h"
 #include "View/WatchFace.h"
 #include "View/WatchyDisplay.h"
+#include "ViewStates/ViewState.h"
+#include "ViewStates/ViewStateFactory.h"
 #include "constants.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include <esp32-hal.h>
 #include <esp_sleep.h>
-
 // DEBUGGING
 #define DEBUG
 
@@ -44,14 +45,18 @@ private:
     GPIOHandler& gpio;
     StateRepository& stateRepo;
 
+    void setViewState(VIEW_STATE_UID newStateID);
+
     // tracks if new view will be displayed
     bool m_viewChanged = false;
     bool m_busy = false;
+    std::unique_ptr<ViewState> m_currentViewState;
 
 protected:
 public:
     // Get singleton instance of Controller class
-    static Controller& getInstance();
+    static Controller&
+    getInstance();
 
     void handleWakeup();
     void handleButtons();

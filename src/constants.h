@@ -90,7 +90,7 @@ constexpr uint16_t NOMOT_DURATION = 2 * 60 * 20; // x20ms = 10s, max 163s (13bit
 constexpr uint16_t NOMOT_THRESHOLD = 10; // .48mG, might be too small
 }
 
-enum class VIEW_STATE {
+enum class VIEW_STATE_UID {
     WATCHFACE,
     STEP,
     CONFIG_PORTAL

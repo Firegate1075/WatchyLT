@@ -10,7 +10,7 @@ bool StateModel::isInMotion() const
     return inMotion;
 }
 
-VIEW_STATE StateModel::getViewState() const
+VIEW_STATE_UID StateModel::getViewStateID() const
 {
     return viewState;
 }
@@ -27,7 +27,7 @@ StateModel& StateModel::setInMotion(bool inMotion)
     return *this;
 }
 
-StateModel& StateModel::setViewState(VIEW_STATE viewState)
+StateModel& StateModel::setViewState(VIEW_STATE_UID viewState)
 {
     this->viewState = viewState;
     return *this;

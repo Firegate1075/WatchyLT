@@ -15,14 +15,13 @@ Controller::Controller()
         // initialize sensors
 
         // BMA needs small delay to be setup correctly
-        delay(1000);
 
         BMA456& bma456 = BMA456::getInstance();
 
         bma456.init();
         bma456.enableStepCounter();
         bma456.setStepCounterWatermark(1);
-        bma456.setStepCountInterruptEnable();
+        // bma456.setStepCountInterruptEnable(); enable only when necessary (step screen)
 
         bma456.setWristInterruptEnable();
         bma456.setNoMotionInterruptEnable();
@@ -30,10 +29,19 @@ Controller::Controller()
         rtc.resetRTC();
         rtc.resetAlarm();
         StateModel stateModel = stateRepo.load();
-        stateModel.setViewState(VIEW_STATE::CONFIG_PORTAL);
+        stateModel.setViewState(VIEW_STATE_UID::CONFIG_PORTAL);
         stateModel.setInMotion(true);
         stateRepo.save(stateModel);
     }
+
+    m_currentViewState = ViewStateFactory::createFromUID(stateRepo.load().getViewStateID());
+}
+
+void Controller::setViewState(VIEW_STATE_UID newStateID)
+{
+    m_currentViewState->onExit();
+    m_currentViewState = ViewStateFactory::createFromUID(stateRepo.load().getViewStateID());
+    m_currentViewState->onEnter();
 }
 
 /**
@@ -110,84 +118,11 @@ void Controller::handleWakeup()
 /// @brief handle user inputs
 void Controller::handleButtons()
 {
-    VIEW_STATE currentState = stateRepo.load().getViewState();
-    VIEW_STATE nextState = currentState; // assume no change, unless specified
+    VIEW_STATE_UID currentState = stateRepo.load().getViewStateID();
 
     uint8_t buttons = gpio.readButtons();
-    using CONST_BUTTON::BACK;
-    using CONST_BUTTON::DOWN;
-    using CONST_BUTTON::MENU;
-    using CONST_BUTTON::UP;
-    switch (currentState) {
-    case VIEW_STATE::WATCHFACE: {
-        if (buttons & UP) {
-            nextState = VIEW_STATE::STEP;
-        }
-        if (buttons & DOWN) {
-            nextState = VIEW_STATE::STEP;
-        }
-    } break;
-    case VIEW_STATE::STEP: {
-        if (buttons & BACK) {
-            nextState = VIEW_STATE::WATCHFACE;
-        }
-        if (buttons & UP) {
-            nextState = VIEW_STATE::WATCHFACE;
-        }
-        if (buttons & DOWN) {
-            nextState = VIEW_STATE::WATCHFACE;
-        }
 
-    } break;
-    case VIEW_STATE::CONFIG_PORTAL: {
-        if (buttons & BACK) {
-            nextState = VIEW_STATE::WATCHFACE;
-
-            debugPrintln("closing WIFI");
-            WifiHandler& wifi = WifiHandler::getInstance();
-            CredentialRepository& credentialRepo = CredentialRepository::getInstance();
-
-            CredentialModel newModel = wifi.getCredentialsOfCurrentNetwork();
-            const etl::vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& vec = credentialRepo.loadAll();
-            bool alreadySaved = false;
-            for (CredentialModel model : vec) {
-                if (model.getSSID() == newModel.getSSID()) {
-                    alreadySaved = true;
-                    debugPrint("Wifi with SSID=");
-                    debugPrint(newModel.getSSID().c_str());
-                    debugPrintln(" was already saved");
-                    break;
-                }
-            }
-
-            if (!alreadySaved && newModel.getSSID().size() > 0) {
-                credentialRepo.save(newModel);
-                debugPrint("Wifi with SSID=");
-                debugPrint(newModel.getSSID().c_str());
-                debugPrintln(" saved");
-            }
-
-            wifi.closeConfigurationPortal();
-
-            debugPrintln("connecting");
-            if (wifi.connectToNetwork(credentialRepo.loadAll())) {
-                debugPrintln("connected");
-                // sync time while connected
-                NTPHandler ntp;
-                pcfTime currentTime = ntp.getTime();
-                rtc.setTimeDate(currentTime);
-            }
-
-            m_busy = false; // we may sleep now
-        }
-    } break;
-
-    default:
-        if (buttons) {
-            nextState = VIEW_STATE::WATCHFACE;
-        }
-        break;
-    }
+    VIEW_STATE_UID nextState = m_currentViewState->handleButtons(buttons);
 
     if (nextState != currentState) {
         m_viewChanged = true;
@@ -196,31 +131,16 @@ void Controller::handleButtons()
         StateModel stateModel = stateRepo.load();
         stateModel.setViewState(nextState);
         stateRepo.save(stateModel);
+
+        // call setViewState here
     }
 }
 
 void Controller::handleRadio()
 {
-    VIEW_STATE currentState = stateRepo.load().getViewState();
-
-    switch (currentState) {
-    case VIEW_STATE::WATCHFACE: {
-
-    } break;
-    case VIEW_STATE::STEP: {
-
-    } break;
-    case VIEW_STATE::CONFIG_PORTAL: {
-        WifiHandler& wifi = WifiHandler::getInstance();
-
-        wifi.openConfigurationPortal();
+    WifiHandler& wifi = WifiHandler::getInstance();
+    if (wifi.isConfigurationPortalOpen())
         wifi.loop();
-    } break;
-
-    default:
-
-        break;
-    }
 }
 
 void Controller::updateScreen()
@@ -237,32 +157,7 @@ void Controller::updateScreen()
 
     bool partial = !stateRepo.load().getInitialBoot() && !m_viewChanged;
 
-    switch (stateRepo.load().getViewState()) {
-    case VIEW_STATE::WATCHFACE: {
-        WatchFace watchFace;
-        pcfTime time;
-        rtc.getTimeDate(time);
-        double vbat = gpio.getBatteryVoltage();
-
-        watchFace.display(time, vbat, partial);
-    } break;
-    case VIEW_STATE::STEP: {
-        StepView stepView;
-        BMA456& bma456 = BMA456::getInstance();
-
-        uint16_t steps = (uint16_t)bma456.getStepCounter();
-
-        stepView.display(steps, partial);
-    } break;
-    case VIEW_STATE::CONFIG_PORTAL: {
-        ConfigPortalView view;
-        view.display(partial);
-        m_busy = true; // prevent Watchy from sleeping while config portal is open
-    } break;
-
-    default:
-        break;
-    }
+    m_currentViewState->updateScreen(partial);
 
     m_viewChanged = false;
 
@@ -295,7 +190,7 @@ void Controller::sleep()
 
 bool Controller::isBusy()
 {
-    return m_busy;
+    return m_currentViewState->isBusy();
 }
 
 Controller& Controller::getInstance()

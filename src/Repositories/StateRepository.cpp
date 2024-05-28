@@ -2,7 +2,7 @@
 
 RTC_DATA_ATTR bool initialBootRaw = true;
 RTC_DATA_ATTR bool inMotionRaw = true;
-RTC_DATA_ATTR VIEW_STATE viewStateRaw;
+RTC_DATA_ATTR VIEW_STATE_UID viewStateRaw;
 
 StateRepository::StateRepository()
 {
@@ -12,7 +12,7 @@ StateRepository::StateRepository()
 void StateRepository::saveModel()
 {
     initialBootRaw = model.getInitialBoot();
-    viewStateRaw = model.getViewState();
+    viewStateRaw = model.getViewStateID();
     inMotionRaw = model.isInMotion();
 }
 
