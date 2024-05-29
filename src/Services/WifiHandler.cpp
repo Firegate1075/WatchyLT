@@ -100,6 +100,11 @@ bool WifiHandler::connectToNetwork(const vector<CredentialModel, CONST_CREDENTIA
     return false;
 }
 
+bool WifiHandler::isConnected()
+{
+    return wifiManager.getLastConxResult() == WL_CONNECTED;
+}
+
 /**
  * @brief Disconnect from current network.
  *

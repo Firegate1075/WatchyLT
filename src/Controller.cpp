@@ -32,9 +32,12 @@ Controller::Controller()
         stateModel.setViewState(VIEW_STATE_UID::CONFIG_PORTAL);
         stateModel.setInMotion(true);
         stateRepo.save(stateModel);
-    }
 
-    m_currentViewState = ViewStateFactory::createFromUID(stateRepo.load().getViewStateID());
+        m_currentViewState = ViewStateFactory::createFromUID(VIEW_STATE_UID::CONFIG_PORTAL);
+        m_currentViewState->onEnter();
+    } else {
+        m_currentViewState = ViewStateFactory::createFromUID(stateRepo.load().getViewStateID());
+    }
 }
 
 void Controller::setViewState(VIEW_STATE_UID newStateID)
@@ -54,6 +57,7 @@ void Controller::handleWakeup()
     esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
     BMA456& bma456 = BMA456::getInstance();
     BMA456_interrupt bma_interrupt = bma456.getInterrupt();
+    StateModel model = stateRepo.load();
 
     switch (cause) {
     case ESP_SLEEP_WAKEUP_EXT0:
@@ -67,7 +71,6 @@ void Controller::handleWakeup()
         // RTC wakeup
         break;
     case ESP_SLEEP_WAKEUP_EXT1:
-        StateModel model;
         if (bma_interrupt != BMA456_interrupt::NONE) {
             debugPrintln("BMA wakeup");
             debugPrint("interrupt=");
@@ -132,15 +135,16 @@ void Controller::handleButtons()
         stateModel.setViewState(nextState);
         stateRepo.save(stateModel);
 
-        // call setViewState here
+        setViewState(nextState);
     }
 }
 
 void Controller::handleRadio()
 {
     WifiHandler& wifi = WifiHandler::getInstance();
-    if (wifi.isConfigurationPortalOpen())
+    if (wifi.isConfigurationPortalOpen()) {
         wifi.loop();
+    }
 }
 
 void Controller::updateScreen()

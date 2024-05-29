@@ -11,6 +11,7 @@ VIEW_STATE_UID ConfigPortalViewState::handleButtons(uint8_t buttons)
 
     if (buttons & CONST_BUTTON::BACK) {
         nextState = VIEW_STATE_UID::WATCHFACE;
+        Serial.println("leaving config portal");
     }
 
     return nextState;
@@ -47,9 +48,11 @@ void ConfigPortalViewState::onExit()
         credentialRepo.save(newModel);
     }
 
-    wifi.closeConfigurationPortal();
+    if (wifi.isConfigurationPortalOpen()) {
+        wifi.closeConfigurationPortal();
+    }
 
-    if (wifi.connectToNetwork(credentialRepo.loadAll())) {
+    if (wifi.isConnected() || wifi.connectToNetwork(credentialRepo.loadAll())) {
         // sync time while connected
         NTPHandler ntp;
         pcfTime currentTime = ntp.getTime();

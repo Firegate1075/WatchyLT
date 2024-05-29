@@ -41,6 +41,7 @@ public:
     void initialize();
     CredentialModel getCredentialsOfCurrentNetwork();
     bool connectToNetwork(const vector<CredentialModel, CONST_CREDENTIALS::MAX_CREDENTIALS>& credentials);
+    bool isConnected();
     bool disconnect();
 
     bool openConfigurationPortal();
