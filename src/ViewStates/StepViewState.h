@@ -17,4 +17,5 @@ public:
 
 protected:
     BMA456& bma456;
+    StepView m_view;
 };

@@ -16,4 +16,5 @@ public:
 protected:
     PCF8563& rtc;
     GPIOHandler& gpio;
+    WatchFace m_view;
 };

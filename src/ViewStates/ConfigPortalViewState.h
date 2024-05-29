@@ -20,4 +20,5 @@ public:
 
 protected:
     WifiHandler& wifi;
+    ConfigPortalView m_view;
 };

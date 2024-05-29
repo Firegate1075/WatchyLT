@@ -19,8 +19,7 @@ VIEW_STATE_UID ConfigPortalViewState::handleButtons(uint8_t buttons)
 
 void ConfigPortalViewState::updateScreen(bool doPartial)
 {
-    ConfigPortalView view;
-    view.display(doPartial);
+    m_view.display(doPartial);
 }
 
 void ConfigPortalViewState::onEnter()

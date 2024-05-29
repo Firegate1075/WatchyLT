@@ -42,23 +42,25 @@ pcfTime NTPHandler::getTime()
     time.Day = response["day"];
     time.Hour = response["hour"];
     time.Minute = response["minute"];
-    time.Second = response["second"];
+    time.Second = response["seconds"];
     String weekdayString = response["dayOfWeek"]; // maybe implement with etl string
 
     if (weekdayString == "Sunday")
         time.Weekday = 0;
-    if (weekdayString == "Monday")
+    else if (weekdayString == "Monday")
         time.Weekday = 1;
-    if (weekdayString == "Tuesday")
+    else if (weekdayString == "Tuesday")
         time.Weekday = 2;
-    if (weekdayString == "Wednesday")
+    else if (weekdayString == "Wednesday")
         time.Weekday = 3;
-    if (weekdayString == "Thursday")
+    else if (weekdayString == "Thursday")
         time.Weekday = 4;
-    if (weekdayString == "Friday")
+    else if (weekdayString == "Friday")
         time.Weekday = 5;
-    if (weekdayString == "Saturday")
+    else if (weekdayString == "Saturday")
         time.Weekday = 6;
+    else
+        time.Weekday = -1;
 
     return time;
 }

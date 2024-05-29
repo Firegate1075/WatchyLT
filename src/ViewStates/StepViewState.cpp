@@ -23,11 +23,9 @@ VIEW_STATE_UID StepViewState::handleButtons(uint8_t buttons)
 
 void StepViewState::updateScreen(bool doPartial)
 {
-    StepView stepView;
-
     uint16_t steps = (uint16_t)bma456.getStepCounter();
 
-    stepView.display(steps, doPartial);
+    m_view.display(steps, doPartial);
 }
 
 void StepViewState::onEnter()
