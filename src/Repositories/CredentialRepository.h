@@ -2,8 +2,11 @@
 
 #include "constants.h"
 #include <Models/CredentialModel.h>
+#include <Preferences.h>
 #include <esp32-hal.h>
+#include <etl/to_string.h>
 #include <etl/vector.h>
+#include <nvs.h>
 
 using CONST_CREDENTIALS::MAX_CREDENTIALS;
 using CONST_CREDENTIALS::PASS_LEN;

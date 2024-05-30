@@ -10,28 +10,45 @@ CredentialRepository::CredentialRepository()
 
 void CredentialRepository::saveModelVector()
 {
-    for (uint8_t index = 0; index < modelVector.size(); index++) {
-        strcpy(ssidRaw[index], modelVector[index].getSSID().c_str());
-        strcpy(passwordRaw[index], modelVector[index].getPassword().c_str());
+    Preferences preferences;
+    preferences.begin(CONST_PREFERENCES::CREDENTIALS_NAMESPACE, false);
+
+    // remove stored credentials
+    preferences.clear();
+
+    for (const CredentialModel& model : modelVector) { // uint8_t index = 0; index < modelVector.size(); index++) {
+        preferences.putString(model.getSSID().c_str(), model.getPassword().c_str());
     }
+
+    preferences.end();
 }
 
 void CredentialRepository::loadModelVector()
 {
     CredentialModel nextCredentials;
+    Preferences preferences;
+    preferences.begin(CONST_PREFERENCES::CREDENTIALS_NAMESPACE, true);
 
     modelVector.clear();
-    for (uint8_t index = 0; index < modelVector.max_size(); index++) {
-        string<SSID_LEN> ssid = ssidRaw[index];
-        if (ssid.size() == 0)
-            break;
 
-        string<PASS_LEN> pass = passwordRaw[index];
+    // TODO: make Preferences iterable -> ranged based for loop
 
-        nextCredentials.setSSID(ssid);
-        nextCredentials.setPassword(pass);
+    nvs_iterator_t it = nvs_entry_find("nvs", CONST_PREFERENCES::CREDENTIALS_NAMESPACE, NVS_TYPE_STR);
+    while (it) {
+        nvs_entry_info_t info {};
+        nvs_entry_info(it, &info); // Can omit error check if parameters are guaranteed to be non-NULL
+
+        nextCredentials.setSSID(info.key);
+        nextCredentials.setPassword(preferences.getString(info.key).c_str());
         modelVector.push_back(nextCredentials);
+
+        it = nvs_entry_next(it);
+        if (modelVector.full() && it) {
+            Serial.println("too many credentials stored!");
+        }
     }
+    nvs_release_iterator(it);
+    preferences.end();
 }
 
 const etl::vector<CredentialModel, MAX_CREDENTIALS>& CredentialRepository::loadAll()

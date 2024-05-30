@@ -7,6 +7,8 @@ namespace CONST_CREDENTIALS {
 constexpr size_t SSID_LEN = 32;
 constexpr size_t PASS_LEN = 64;
 constexpr size_t MAX_CREDENTIALS = 8;
+constexpr const char SSID_KEY[] = "ssid";
+constexpr const char PASS_KEY[] = "pass";
 } // namespace CONST_CREDENTIALS
 
 namespace CONST_MENU {
@@ -52,6 +54,7 @@ constexpr uint8_t IP_LENGTH = 16;
 constexpr uint8_t URL_LENGTH = 100;
 constexpr const char timeApiURL[] = "https://timeapi.io/api/Time/current/ip";
 constexpr const char ipApiURL[] = "https://api.ipify.org/?format=text";
+constexpr int32_t IP_TIMEOUT = 10000;
 }
 
 namespace CONST_DISPLAY {
@@ -88,6 +91,10 @@ constexpr uint16_t ANYMOT_DURATION = 5; // x20ms = 100ms, max 163s
 constexpr uint16_t ANYMOT_THRESHOLD = 0xaa; // default
 constexpr uint16_t NOMOT_DURATION = 2 * 60 * 20; // x20ms = 10s, max 163s (13bit?)
 constexpr uint16_t NOMOT_THRESHOLD = 10; // .48mG, might be too small
+}
+
+namespace CONST_PREFERENCES {
+constexpr const char CREDENTIALS_NAMESPACE[] = "cred";
 }
 
 enum class VIEW_STATE_UID {

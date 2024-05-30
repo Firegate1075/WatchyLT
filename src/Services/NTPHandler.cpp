@@ -8,6 +8,7 @@ etl::string<CONST_NETWORK::IP_LENGTH> NTPHandler::getIP()
 {
     Serial.print("Getting IP. URL=");
     http.begin(CONST_NETWORK::ipApiURL);
+    http.setConnectTimeout(CONST_NETWORK::IP_TIMEOUT);
     Serial.println(CONST_NETWORK::ipApiURL);
     http.GET();
     String ip = http.getString();
