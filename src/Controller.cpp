@@ -25,7 +25,6 @@ Controller::Controller()
         bma456.setStepCounterWatermark(1);
         // bma456.setStepCountInterruptEnable(); enable only when necessary (step screen)
 
-        bma456.setWristInterruptEnable();
         bma456.setNoMotionInterruptEnable();
 
         rtc.resetRTC();

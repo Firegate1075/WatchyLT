@@ -28,3 +28,16 @@ void WatchFaceState::updateScreen(bool doPartial)
 
     m_view.display(time, vbat, doPartial);
 }
+
+void WatchFaceState::onEnter()
+{
+    BMA456& bma = BMA456::getInstance();
+    bma.setWristInterruptEnable(true);
+}
+
+void WatchFaceState::onExit()
+{
+    BMA456& bma = BMA456::getInstance();
+    bma.setWristInterruptEnable(false);
+    bma.disableWristWearDetection();
+}

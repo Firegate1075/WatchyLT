@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/PCF8563.h"
 #include "View/WatchFace.h"
@@ -12,6 +13,9 @@ public:
 
     VIEW_STATE_UID handleButtons(uint8_t buttons);
     void updateScreen(bool doPartial);
+
+    void onEnter();
+    void onExit();
 
 protected:
     PCF8563& rtc;
