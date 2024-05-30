@@ -2,8 +2,6 @@
 
 StepView::StepView()
 {
-    Serial.println("StepView Constructor");
-    Serial.flush();
 }
 
 // TODO: replace String with static memory (etl string)

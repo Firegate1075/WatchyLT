@@ -2,8 +2,6 @@
 
 WatchFace::WatchFace()
 {
-    Serial.println("WatchFace Constructor");
-    Serial.flush();
 }
 
 // TODO: replace String with static memory (etl string)

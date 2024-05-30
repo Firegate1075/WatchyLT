@@ -16,8 +16,6 @@ public:
     // Get singleton instance of PCF8563 class
     static PCF8563& getInstance()
     {
-        Serial.println("PCF8563 get instanace");
-        Serial.flush();
         static PCF8563 instance;
         return instance;
     }

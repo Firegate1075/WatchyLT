@@ -7,8 +7,10 @@ Controller::Controller()
 {
     Wire.begin(SDA, SCL);
 
-    debugPrint("Initial boot=");
-    debugPrintln(stateRepo.load().getInitialBoot());
+    debugPrintln("---------------------\nBoot");
+    debugPrintf("initialBoot=%d\n", stateRepo.load().getInitialBoot());
+    debugPrintf("inMotion=%d\n", stateRepo.load().isInMotion());
+    debugPrintf("viewState=%d\n", (uint8_t)stateRepo.load().getViewStateID());
 
     // handle initialBoot (wakeup after flashing)
     if (stateRepo.load().getInitialBoot()) {
@@ -73,11 +75,9 @@ void Controller::handleWakeup()
     case ESP_SLEEP_WAKEUP_EXT1:
         if (bma_interrupt != BMA456_interrupt::NONE) {
             debugPrintln("BMA wakeup");
-            debugPrint("interrupt=");
-            debugPrintln((uint8_t)bma_interrupt);
-
             switch (bma_interrupt) {
             case BMA456_interrupt::ANY_MOT:
+                debugPrintln("any mot int");
                 stateRepo.save(model.setInMotion(true));
 
                 bma456.setNoMotionInterruptEnable(true);
@@ -101,6 +101,10 @@ void Controller::handleWakeup()
                 // activate reduced alarms
                 rtc.clearAlarm();
                 rtc.setAlarm(CONST_RTC::REDUCED_WAKEUP_MINUTES);
+                break;
+            default:
+                debugPrint("interrupt=");
+                debugPrintln((uint8_t)bma_interrupt);
                 break;
             }
         } else {
@@ -187,6 +191,8 @@ void Controller::sleep()
     esp_sleep_enable_ext0_wakeup((gpio_num_t)CONST_PIN::RTC_INT, LOW);
     // wake up on any button press or BMA456 interrupt(active high)
     esp_sleep_enable_ext1_wakeup(wakeupPinMask, ESP_EXT1_WAKEUP_ANY_HIGH);
+
+    debugPrintln("Entering deep sleep!\n");
 
     // ... and sleep
     esp_deep_sleep_start();

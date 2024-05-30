@@ -28,10 +28,14 @@
 #define debugPrintln(x) \
     Serial.println(x);  \
     Serial.flush();
+#define debugPrintf(...)        \
+    Serial.printf(__VA_ARGS__); \
+    Serial.flush();
 #else
 #define debugBegin()
 #define debugPrint(x)
 #define debugPrintln(x)
+#define debugPrintf(...)
 #endif
 
 /// @brief Controller class for Watchy

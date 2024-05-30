@@ -15,8 +15,6 @@ public:
     // Get singleton instance of BLEHandler class
     static GPIOHandler& getInstance()
     {
-        Serial.println("GPIOHandler get instanace");
-        Serial.flush();
         static GPIOHandler instance;
         return instance;
     }
