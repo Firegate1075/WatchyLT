@@ -1,4 +1,5 @@
 #include "CredentialRepository.h"
+#include "iPreferences.h"
 
 RTC_DATA_ATTR char ssidRaw[MAX_CREDENTIALS][32];
 RTC_DATA_ATTR char passwordRaw[MAX_CREDENTIALS][64];
@@ -26,28 +27,22 @@ void CredentialRepository::saveModelVector()
 void CredentialRepository::loadModelVector()
 {
     CredentialModel nextCredentials;
-    Preferences preferences;
-    preferences.begin(CONST_PREFERENCES::CREDENTIALS_NAMESPACE, true);
+
+    iPreferences preferences;
+    preferences.begin(CONST_PREFERENCES::CREDENTIALS_NAMESPACE, true, NULL);
 
     modelVector.clear();
 
-    // TODO: make Preferences iterable -> ranged based for loop
-
-    nvs_iterator_t it = nvs_entry_find("nvs", CONST_PREFERENCES::CREDENTIALS_NAMESPACE, NVS_TYPE_STR);
-    while (it) {
-        nvs_entry_info_t info {};
-        nvs_entry_info(it, &info); // Can omit error check if parameters are guaranteed to be non-NULL
-
-        nextCredentials.setSSID(info.key);
-        nextCredentials.setPassword(preferences.getString(info.key).c_str());
-        modelVector.push_back(nextCredentials);
-
-        it = nvs_entry_next(it);
-        if (modelVector.full() && it) {
+    for (const auto& key : preferences.strings()) {
+        if (modelVector.full()) {
             Serial.println("too many credentials stored!");
         }
+
+        nextCredentials.setSSID(key);
+        nextCredentials.setPassword(preferences.getString(key).c_str());
+        modelVector.push_back(nextCredentials);
     }
-    nvs_release_iterator(it);
+
     preferences.end();
 }
 
