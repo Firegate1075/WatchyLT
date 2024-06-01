@@ -24,16 +24,16 @@ public:
         const char* m_partition_name;
     };
 
-    template <nvs_type_t type>
     struct PreferencesIterable {
-        PreferencesIterable(const char* partition_name, const char* namespace_name)
+        PreferencesIterable(const char* partition_name, const char* namespace_name, nvs_type_t type)
             : m_namespace_name(namespace_name)
             , m_partition_name(partition_name)
+            , m_type(type)
         {
         }
         PreferencesIterator begin()
         {
-            nvs_iterator_t it = nvs_entry_find(m_partition_name, m_namespace_name, type);
+            nvs_iterator_t it = nvs_entry_find(m_partition_name, m_namespace_name, m_type);
             return iPreferences::PreferencesIterator(m_partition_name, m_namespace_name, it);
         }
         PreferencesIterator end()
@@ -44,23 +44,23 @@ public:
     private:
         const char* m_namespace_name;
         const char* m_partition_name;
+        nvs_type_t m_type;
     };
 
 public:
     bool begin(const char* name, bool readOnly = false, const char* partition_label = NULL); // overwrite begin to save partition name and namespace
 
-    template <nvs_type_t type>
-    PreferencesIterable<type> iterate()
+    PreferencesIterable iterate(nvs_type_t type)
     {
-        return PreferencesIterable<type>(m_partition_name, m_namespace_name);
+        return PreferencesIterable(m_partition_name, m_namespace_name, type);
     }
-    PreferencesIterable<NVS_TYPE_ANY> items()
+    PreferencesIterable items()
     {
-        return iterate<NVS_TYPE_ANY>();
+        return iterate(NVS_TYPE_ANY);
     }
-    PreferencesIterable<NVS_TYPE_STR> strings()
+    PreferencesIterable strings()
     {
-        return iterate<NVS_TYPE_STR>();
+        return iterate(NVS_TYPE_STR);
     }
 
 private:
