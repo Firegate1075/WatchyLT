@@ -32,4 +32,5 @@ public:
 
     void initialize();
     void startAdvertising();
+    bool isServerAdvertising();
 };
