@@ -4,6 +4,7 @@ BLEHandler::BLEHandler()
 {
 }
 
+//must be called first
 void BLEHandler::initialize()
 {
     //initialize the BLE environment
@@ -23,4 +24,13 @@ void BLEHandler::initialize()
 
     //start the service
     bleService->start();
+}
+
+void BLEHandler::startAdvertising()
+{
+    //get advertising from ble server
+    bleAdvertising = bleServer->getAdvertising();
+
+    //start advertising
+    bleAdvertising->start();
 }

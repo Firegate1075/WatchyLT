@@ -3,6 +3,7 @@
 #include <BLEServer.h>
 #include <BLEService.h>
 #include <BLECharacteristic.h>
+#include <BLEAdvertising.h>
 
 class BLEHandler {
 private:
@@ -13,7 +14,7 @@ private:
     static BLEServer* bleServer;
     static BLEService* bleService;
     static BLECharacteristic* bleCharacteristic;
-
+    static BLEAdvertising* bleAdvertising;
 
 protected:
 public:
@@ -28,4 +29,5 @@ public:
     void operator=(const BLEHandler&) = delete;
 
     void initialize();
+    void startAdvertising();
 };
