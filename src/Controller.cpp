@@ -153,6 +153,11 @@ void Controller::handleRadio()
 void Controller::handleBLE()
 {
     BLEHandler& bleHandler = BLEHandler::getInstance();
+
+    if(!bleHandler.isServerAdvertising()) {
+        bleHandler.initialize();
+        bleHandler.startAdvertising();
+    }
 }
 
 void Controller::updateScreen()
