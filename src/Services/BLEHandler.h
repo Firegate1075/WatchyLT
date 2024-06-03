@@ -15,6 +15,8 @@ private:
     static BLEService* bleService;
     static BLECharacteristic* bleCharacteristic;
     static BLEAdvertising* bleAdvertising;
+    //flags
+    static bool isAdvertising;
 
 protected:
 public:

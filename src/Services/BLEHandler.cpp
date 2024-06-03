@@ -24,6 +24,9 @@ void BLEHandler::initialize()
 
     //start the service
     bleService->start();
+
+    //set initial values of flags
+    isAdvertising = false;
 }
 
 void BLEHandler::startAdvertising()
@@ -32,5 +35,8 @@ void BLEHandler::startAdvertising()
     bleAdvertising = bleServer->getAdvertising();
 
     //start advertising
-    bleAdvertising->start();
+    if(isAdvertising){
+        bleAdvertising->start();
+        isAdvertising = true;
+    }
 }
