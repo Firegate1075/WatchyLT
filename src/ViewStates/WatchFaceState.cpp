@@ -11,7 +11,7 @@ VIEW_STATE_UID WatchFaceState::handleButtons(uint8_t buttons)
     VIEW_STATE_UID nextState = VIEW_STATE_UID::WATCHFACE;
 
     if (buttons & CONST_BUTTON::UP) {
-        nextState = VIEW_STATE_UID::STEP;
+        nextState = VIEW_STATE_UID::CONFIG_PORTAL;
     }
     if (buttons & CONST_BUTTON::DOWN) {
         nextState = VIEW_STATE_UID::STEP;

@@ -18,6 +18,8 @@ void WifiHandler::initialize()
     wifiManager.setAPCallback(onAPStart);
     wifiManager.setSaveConfigCallback(onConfigSaveAndConnect);
     wifiManager.setConfigPortalTimeoutCallback(onConfigPortalTimeout);
+
+    wifiManager.setHostname("WatchyLT");
 }
 
 /**

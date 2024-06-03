@@ -55,6 +55,7 @@ constexpr uint8_t URL_LENGTH = 100;
 constexpr const char timeApiURL[] = "https://timeapi.io/api/Time/current/ip";
 constexpr const char ipApiURL[] = "https://api.ipify.org/?format=text";
 constexpr int32_t IP_TIMEOUT = 10000;
+constexpr const char AP_IP_ADDRESS[] = "192.168.4.1";
 }
 
 namespace CONST_DISPLAY {
