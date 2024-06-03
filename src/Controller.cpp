@@ -150,6 +150,11 @@ void Controller::handleRadio()
     }
 }
 
+void Controller::handleBLE()
+{
+    BLEHandler& bleHandler = BLEHandler::getInstance();
+}
+
 void Controller::updateScreen()
 {
     // initialize display (ugly here, maybe static method in WatchyDisplay? maybe have class inherit from GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>?)

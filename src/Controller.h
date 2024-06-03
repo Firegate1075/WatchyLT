@@ -6,6 +6,7 @@
 #include "Services/NTPHandler.h"
 #include "Services/PCF8563.h"
 #include "Services/WifiHandler.h"
+#include "Services/BLEHandler.h"
 #include "View/ConfigPortalView.h"
 #include "View/StepView.h"
 #include "View/WatchFace.h"
@@ -65,6 +66,7 @@ public:
     void handleWakeup();
     void handleButtons();
     void handleRadio();
+    void handleBLE();
     void updateScreen();
     void sleep();
     bool isBusy();
