@@ -11,12 +11,12 @@ private:
     BLEHandler();
     ~BLEHandler() { }
 
-    static BLEServer* bleServer;
-    static BLEService* bleService;
-    static BLECharacteristic* bleCharacteristic;
-    static BLEAdvertising* bleAdvertising;
+    BLEServer* bleServer;
+    BLEService* bleService;
+    BLECharacteristic* bleCharacteristic;
+    BLEAdvertising* bleAdvertising;
     //flags
-    static bool isAdvertising;
+    bool isAdvertising;
 
 protected:
 public:
