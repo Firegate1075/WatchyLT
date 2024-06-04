@@ -15,6 +15,7 @@ void setup()
     while (controller.isBusy()) {
         controller.handleButtons();
         controller.handleRadio();
+        controller.handleBLE();
     }
     controller.updateScreen();
 
