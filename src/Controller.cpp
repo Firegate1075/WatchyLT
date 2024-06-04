@@ -154,7 +154,8 @@ void Controller::handleBLE()
 {
     BLEHandler& bleHandler = BLEHandler::getInstance();
 
-    if(!bleHandler.isServerAdvertising()) {
+    if (!bleHandler.isServerAdvertising()) {
+        debugPrintln("BLE initialized");
         bleHandler.initialize();
         bleHandler.startAdvertising();
     }

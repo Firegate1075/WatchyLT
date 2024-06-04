@@ -4,38 +4,43 @@ BLEHandler::BLEHandler()
 {
 }
 
-//must be called first
+// must be called first
 void BLEHandler::initialize()
 {
-    //initialize the BLE environment
+    // initialize the BLE environment
     BLEDevice::init("WatchyBluetoothLE");
 
-    //create the server
+    // create the server
     bleServer = BLEDevice::createServer();
 
-    //create the service
-    bleService = bleServer->createService("testservice");
+    // create the service
+    bleService = bleServer->createService("18796165-5846-49a9-bb18-60a19b87b659");
 
-    //create the characteristics
-    bleCharacteristic = bleService->createCharacteristic("testcharacteristic", 0);
+    // create the characteristics
+    bleCharacteristic = bleService->createCharacteristic("cb09c2d0-ff16-4e90-b1b3-dd7937477fa5", BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
 
-    //set the characteristic value
+    // set the characteristic value
     bleCharacteristic->setValue("Hello World!");
 
-    //start the service
+    // start the service
     bleService->start();
 
-    //set initial values of flags
+    // set initial values of flags
     BLEHandler::isAdvertising = false;
 }
 
 void BLEHandler::startAdvertising()
 {
-    //get advertising from ble server
+    // get advertising from ble server
     bleAdvertising = bleServer->getAdvertising();
 
-    //start advertising
-    if(isAdvertising){
+    // start advertising
+    if (!isAdvertising) {
+        bleAdvertising->addServiceUUID("18796165-5846-49a9-bb18-60a19b87b659");
+        bleAdvertising->setScanResponse(true);
+        bleAdvertising->setMinPreferred(0x06); // functions that help with iPhone connections issue
+        bleAdvertising->setMinPreferred(0x12);
+
         bleAdvertising->start();
         isAdvertising = true;
     }
