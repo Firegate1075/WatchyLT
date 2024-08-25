@@ -35,7 +35,7 @@ void CredentialRepository::loadModelVector()
 
     for (const auto& key : preferences.strings()) {
         if (modelVector.full()) {
-            Serial.println("too many credentials stored!");
+            debugPrintln("too many credentials stored!");
         }
 
         nextCredentials.setSSID(key);

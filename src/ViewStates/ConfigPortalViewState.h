@@ -6,6 +6,7 @@
 #include "Services/WifiHandler.h"
 #include "View/ConfigPortalView.h"
 #include "ViewStates/ViewState.h"
+#include "DebugUtils.h"
 
 class ConfigPortalViewState : public ViewState {
 public:

@@ -11,7 +11,7 @@ VIEW_STATE_UID ConfigPortalViewState::handleButtons(uint8_t buttons)
 
     if (buttons & CONST_BUTTON::BACK) {
         nextState = VIEW_STATE_UID::WATCHFACE;
-        Serial.println("leaving config portal");
+        debugPrintln("leaving config portal");
     } else if (buttons & CONST_BUTTON::UP) {
         nextState = VIEW_STATE_UID::STEP;
     } else if (buttons & CONST_BUTTON::DOWN) {

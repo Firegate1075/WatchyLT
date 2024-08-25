@@ -6,21 +6,21 @@ void NTPHandler::wifiCallback()
 
 etl::string<CONST_NETWORK::IP_LENGTH> NTPHandler::getIP()
 {
-    Serial.print("Getting IP. URL=");
+    debugPrint("Getting IP. URL=");
     http.begin(CONST_NETWORK::ipApiURL);
     http.setConnectTimeout(CONST_NETWORK::IP_TIMEOUT);
-    Serial.println(CONST_NETWORK::ipApiURL);
+    debugPrintln(CONST_NETWORK::ipApiURL);
     http.GET();
     String ip = http.getString();
-    Serial.print("ip=");
-    Serial.println(ip);
+    debugPrint("ip=");
+    debugPrintln(ip);
     return etl::string<CONST_NETWORK::IP_LENGTH>(ip.c_str());
 }
 
 pcfTime NTPHandler::getTime()
 {
     auto ip = getIP();
-    Serial.print("Getting time. URL=");
+    debugPrint("Getting time. URL=");
 
     etl::string<CONST_NETWORK::URL_LENGTH> url = CONST_NETWORK::timeApiURL;
     url += "?ipAddress=";
@@ -28,10 +28,10 @@ pcfTime NTPHandler::getTime()
 
     http.begin(url.c_str());
 
-    Serial.println(url.c_str());
+    debugPrintln(url.c_str());
     http.GET();
     String responseString = http.getString();
-    Serial.println(responseString);
+    debugPrintln(responseString);
     JsonDocument response;
     deserializeJson(response, responseString.c_str());
 

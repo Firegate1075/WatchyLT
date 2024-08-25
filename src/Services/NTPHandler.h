@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "ArduinoJson.h"
+#include "DebugUtils.h"
 #include "HTTPClient.h"
 #include "WifiObserver.h"
 #include "constants.h"

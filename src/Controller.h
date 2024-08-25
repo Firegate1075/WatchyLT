@@ -1,12 +1,13 @@
 #pragma once
+#include "DebugUtils.h"
 #include "Repositories/CredentialRepository.h"
 #include "Repositories/StateRepository.h"
+#include "Services/BLEHandler.h"
 #include "Services/BMA456.h"
 #include "Services/GPIOHandler.h"
 #include "Services/NTPHandler.h"
 #include "Services/PCF8563.h"
 #include "Services/WifiHandler.h"
-#include "Services/BLEHandler.h"
 #include "View/ConfigPortalView.h"
 #include "View/StepView.h"
 #include "View/WatchFace.h"
@@ -18,26 +19,6 @@
 #include <Wire.h>
 #include <esp32-hal.h>
 #include <esp_sleep.h>
-// DEBUGGING
-#define DEBUG
-
-#ifdef DEBUG
-#define debugBegin() Serial.begin(115200)
-#define debugPrint(x) \
-    Serial.print(x);  \
-    Serial.flush();
-#define debugPrintln(x) \
-    Serial.println(x);  \
-    Serial.flush();
-#define debugPrintf(...)        \
-    Serial.printf(__VA_ARGS__); \
-    Serial.flush();
-#else
-#define debugBegin()
-#define debugPrint(x)
-#define debugPrintln(x)
-#define debugPrintf(...)
-#endif
 
 /// @brief Controller class for Watchy
 class Controller {
