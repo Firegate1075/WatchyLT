@@ -104,6 +104,24 @@ enum class VIEW_STATE_UID {
     CONFIG_PORTAL
 };
 
+namespace CONST_MONTH_NAME {
+constexpr const char* monthNamesEN[13] = {
+    "ERROR", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+};
+constexpr const char* monthNamesShortEN[13] = {
+    "ERROR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+};
+
+namespace CONST_DAY_NAME {
+constexpr const char* dayNamesEN[7] = {
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+};
+constexpr const char* dayNamesShortEN[7] = {
+    "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+};
+};
+
 typedef struct {
     uint8_t Second;
     uint8_t Minute;

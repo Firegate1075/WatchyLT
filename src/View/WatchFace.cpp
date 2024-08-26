@@ -4,26 +4,47 @@ WatchFace::WatchFace()
 {
 }
 
-// TODO: replace String with static memory (etl string)
 void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
 {
-    int16_t x1, y1, curX, curY;
-    uint16_t w, h;
-
-    screen.setFont(&Metropolis_Black16pt7b);
+    screen.setFont(&Metropolis_Black24pt7b);
 
     char timeStr[6];
     makeTimeString(timeStr, td.Hour, td.Minute);
 
     // print time centered
-    screen.getTextBounds(timeStr, 0, 0, &x1, &y1, &w, &h);
-    screen.setCursor((CONST_DISPLAY::WIDTH - w) / 2, (CONST_DISPLAY::HEIGHT + h) / 2);
-    screen.println(timeStr);
+    screen.setCursor(0, 60);
+    printlnHorizontallyCentered(timeStr);
 
+
+    // Change font for Date
+    screen.setFont(&Metropolis_Black12pt7b);
+    etl::string<25> date;
+
+    // Print weekday name
+    date = CONST_DAY_NAME::dayNamesEN[td.Weekday];
+    printlnHorizontallyCentered(date.c_str(), -20);     // Use offset, because font size was changed (remove blank space on display)
+
+    // Print day of month and month name
+    etl::to_string(td.Day, date, false);
+    date += ". ";
+    date += CONST_MONTH_NAME::monthNamesShortEN[td.Month];
+    printlnHorizontallyCentered(date.c_str());
+
+    // Print Year
+    date = "20";
+    etl::to_string(td.Year, date, true);
+    printlnHorizontallyCentered(date.c_str());
+
+
+    // Print Battery voltage
     screen.setFont(&Metropolis_Black11pt7b);
-    screen.print(vbat);
-    screen.println("V");
+    etl::string<5> vbatStr;
+    etl::format_spec format;
+    format.precision(2);
 
+    etl::to_string(vbat, vbatStr, format);
+    vbatStr += "V";
+    printlnAlignedRight(vbatStr.c_str());
     screen.display(doPartial);
 }
 

@@ -9,6 +9,9 @@ protected:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>& screen;
     View();
 
+    void printlnHorizontallyCentered(const char* text, int16_t heightOffset = 0);
+    void printlnAlignedRight(const char* text, int16_t heightOffset = 0);
+
 public:
     void hibernate();
 };
