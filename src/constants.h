@@ -129,5 +129,5 @@ typedef struct {
     uint8_t Weekday; // 0-6
     uint8_t Day; // 1-31
     uint8_t Month; // 1-12
-    uint8_t Year; // 2000 - 2099
+    uint16_t Year; // 2000 - 2099
 } dateTime;
