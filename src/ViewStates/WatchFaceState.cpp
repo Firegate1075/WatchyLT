@@ -22,7 +22,7 @@ VIEW_STATE_UID WatchFaceState::handleButtons(uint8_t buttons)
 
 void WatchFaceState::updateScreen(bool doPartial)
 {
-    pcfTime time;
+    dateTime time;
     rtc.getTimeDate(time);
     double vbat = gpio.getBatteryVoltage();
 

@@ -17,7 +17,7 @@ etl::string<CONST_NETWORK::IP_LENGTH> NTPHandler::getIP()
     return etl::string<CONST_NETWORK::IP_LENGTH>(ip.c_str());
 }
 
-pcfTime NTPHandler::getTime()
+dateTime NTPHandler::getTime()
 {
     auto ip = getIP();
     debugPrint("Getting time. URL=");
@@ -35,10 +35,10 @@ pcfTime NTPHandler::getTime()
     JsonDocument response;
     deserializeJson(response, responseString.c_str());
 
-    pcfTime time;
+    dateTime time;
 
     uint16_t yearRaw = response["year"];
-    time.Year = ((uint8_t)yearRaw - 2000); // time.Year saves only 00..99 of year
+    time.Year = ((uint8_t)yearRaw);
     time.Month = response["month"];
     time.Day = response["day"];
     time.Hour = response["hour"];

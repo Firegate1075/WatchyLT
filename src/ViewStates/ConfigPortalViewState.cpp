@@ -58,7 +58,7 @@ void ConfigPortalViewState::onExit()
     if (wifi.isConnected() || wifi.connectToNetwork(credentialRepo.loadAll())) {
         // sync time while connected
         NTPHandler ntp;
-        pcfTime currentTime = ntp.getTime();
+        dateTime currentTime = ntp.getTime();
 
         PCF8563& rtc = PCF8563::getInstance();
         rtc.setTimeDate(currentTime);

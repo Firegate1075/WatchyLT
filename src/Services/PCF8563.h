@@ -24,8 +24,8 @@ public:
     void operator=(const PCF8563&) = delete;
 
     void resetRTC();
-    void setTimeDate(pcfTime tm);
-    void getTimeDate(pcfTime& tm);
+    void setTimeDate(dateTime tm);
+    void getTimeDate(dateTime& tm);
     void resetAlarm();
     void clearAlarm();
     void setAlarm(uint8_t minutesToWakeup = 1);

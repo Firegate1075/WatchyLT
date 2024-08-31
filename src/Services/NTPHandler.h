@@ -12,7 +12,7 @@ public:
     virtual void wifiCallback();
 
     etl::string<CONST_NETWORK::IP_LENGTH> getIP();
-    pcfTime getTime();
+    dateTime getTime();
 
 protected:
 private:

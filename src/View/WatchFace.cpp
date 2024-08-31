@@ -4,7 +4,7 @@ WatchFace::WatchFace()
 {
 }
 
-void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
+void WatchFace::display(const dateTime& td, double vbat, bool doPartial)
 {
     screen.setFont(&Metropolis_Black24pt7b);
 
@@ -15,14 +15,13 @@ void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
     screen.setCursor(0, 60);
     printlnHorizontallyCentered(timeStr);
 
-
     // Change font for Date
     screen.setFont(&Metropolis_Black12pt7b);
     etl::string<25> date;
 
     // Print weekday name
     date = CONST_DAY_NAME::dayNamesEN[td.Weekday];
-    printlnHorizontallyCentered(date.c_str(), -20);     // Use offset, because font size was changed (remove blank space on display)
+    printlnHorizontallyCentered(date.c_str(), -20); // Use offset, because font size was changed (remove blank space on display)
 
     // Print day of month and month name
     etl::to_string(td.Day, date, false);
@@ -31,10 +30,9 @@ void WatchFace::display(const pcfTime& td, double vbat, bool doPartial)
     printlnHorizontallyCentered(date.c_str());
 
     // Print Year
-    date = "20";
+    date = "";
     etl::to_string(td.Year, date, true);
     printlnHorizontallyCentered(date.c_str());
-
 
     // Print Battery voltage
     screen.setFont(&Metropolis_Black11pt7b);

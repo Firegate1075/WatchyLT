@@ -14,5 +14,5 @@ private:
 
 public:
     WatchFace();
-    void display(const pcfTime& td, double vbat, bool doPartial);
+    void display(const dateTime& td, double vbat, bool doPartial);
 };

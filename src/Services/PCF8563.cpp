@@ -18,12 +18,10 @@ void PCF8563::resetRTC()
  *
  * @param tm -> Struct containing time and date
  */
-void PCF8563::setTimeDate(pcfTime tm)
+void PCF8563::setTimeDate(dateTime tm)
 {
-    // time_t t = makeTime(tm);
-    // breakTime(t, tm);
-
-    rtc.setDate(tm.Day, tm.Weekday, tm.Month, CONST_RTC::CENTURY, tm.Year);
+    // PFC only stores "00" to "99" as year
+    rtc.setDate(tm.Day, tm.Weekday, tm.Month, CONST_RTC::CENTURY, tm.Year - 2000);
     rtc.setTime(tm.Hour, tm.Minute, tm.Second);
     resetAlarm();
 }
@@ -33,12 +31,12 @@ void PCF8563::setTimeDate(pcfTime tm)
  *
  * @param tm -> Struct which will contain retrieved time and date
  */
-void PCF8563::getTimeDate(pcfTime& tm)
+void PCF8563::getTimeDate(dateTime& tm)
 {
     rtc.getDate();
     rtc.getTime();
 
-    tm.Year = rtc.getYear();
+    tm.Year = rtc.getYear() + 2000; // PFC only stores "00" to "99"
     tm.Month = rtc.getMonth();
     tm.Weekday = rtc.getWeekday();
 

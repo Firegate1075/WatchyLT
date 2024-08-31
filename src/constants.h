@@ -123,11 +123,11 @@ constexpr const char* dayNamesShortEN[7] = {
 };
 
 typedef struct {
-    uint8_t Second;
-    uint8_t Minute;
-    uint8_t Hour;
-    uint8_t Weekday;
-    uint8_t Day;
-    uint8_t Month;
-    uint8_t Year;
-} pcfTime;
+    uint8_t Second; // 0-59
+    uint8_t Minute; // 0-59
+    uint8_t Hour; // 0-23
+    uint8_t Weekday; // 0-6
+    uint8_t Day; // 1-31
+    uint8_t Month; // 1-12
+    uint8_t Year; // 2000 - 2024
+} dateTime;
